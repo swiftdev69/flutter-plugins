@@ -183,9 +183,10 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .readData(DataReadRequest.Builder()
                                 .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
                                 .bucketByTime(1, TimeUnit.DAYS)
-                                .read(dataType)
+                                //.read(dataType)
                                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                                .build())
+                                .build()
+                        )
 
                 /// Fetch all data points for the specified DataType
                 val dataPoints = Tasks.await<DataReadResponse>(response).getDataSet(dataType)
