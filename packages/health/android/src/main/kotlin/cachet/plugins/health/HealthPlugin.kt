@@ -1,9 +1,13 @@
 package cachet.plugins.health
 
 import android.app.Activity
+import android.content.Intent
+import android.os.Handler
+import android.util.Log
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.FitnessOptions
+import com.google.android.gms.fitness.data.*
 import com.google.android.gms.fitness.request.DataReadRequest
 import com.google.android.gms.fitness.result.DataReadResponse
 import com.google.android.gms.tasks.Tasks
@@ -11,14 +15,10 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import io.flutter.plugin.common.PluginRegistry.Registrar
-import android.content.Intent
-import android.os.Handler
-import android.util.Log
 import io.flutter.plugin.common.PluginRegistry.ActivityResultListener
+import io.flutter.plugin.common.PluginRegistry.Registrar
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
-import com.google.android.gms.fitness.data.*
 
 const val GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 1111
 
@@ -41,6 +41,12 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
     private var MOVE_MINUTES = "MOVE_MINUTES"
     private var DISTANCE_DELTA = "DISTANCE_DELTA"
 
+    var ESTIMATED_STEP_DELTAS: DataSource = DataSource.Builder()
+            .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
+            .setType(DataSource.TYPE_DERIVED)
+            .setStreamName("estimated_steps")
+            .setAppPackageName("com.google.android.gms")
+            .build()
 
     companion object {
         @JvmStatic
@@ -175,6 +181,8 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                 val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
                         .readData(DataReadRequest.Builder()
+                                .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                                .bucketByTime(1, TimeUnit.DAYS)
                                 .read(dataType)
                                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                                 .build())
