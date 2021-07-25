@@ -180,6 +180,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 .setTimeRange(startTime, endTime, TimeUnit.SECONDS)
                 .bucketByTime(1, TimeUnit.DAYS)
                 .enableServerQueries()
+                .read(dataType)
                 .build()
 
         /// Start a new thread for doing a GoogleFit data lookup
