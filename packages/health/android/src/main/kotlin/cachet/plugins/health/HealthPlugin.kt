@@ -10,6 +10,7 @@ import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.*
 import com.google.android.gms.fitness.request.DataReadRequest
 import com.google.android.gms.fitness.result.DataReadResponse
+import com.google.android.gms.fitness.result.DataReadResult
 import com.google.android.gms.tasks.Tasks
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -19,6 +20,7 @@ import io.flutter.plugin.common.PluginRegistry.ActivityResultListener
 import io.flutter.plugin.common.PluginRegistry.Registrar
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
+
 
 const val GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 1111
 
@@ -175,16 +177,18 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         val dataType = keyToHealthDataType(type)
         val unit = getUnit(type)
 
-        var readRequest = DataReadRequest.Builder()
-                .aggregate(ESTIMATED_STEP_DELTAS , DataType.AGGREGATE_STEP_COUNT_DELTA)
+        val readRequest: DataReadRequest = DataReadRequest.Builder()
+                .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .setTimeRange(startTime, endTime, TimeUnit.SECONDS)
                 .bucketByTime(1, TimeUnit.DAYS)
                 .enableServerQueries()
                 .build()
 
+
         /// Start a new thread for doing a GoogleFit data lookup
         thread {
             try {
+
                 val fitnessOptions = FitnessOptions.builder().addDataType(dataType).build()
                 val googleSignInAccount = GoogleSignIn.getAccountForExtension(activity.applicationContext, fitnessOptions)
 
@@ -192,12 +196,14 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
                         .readData(
                                 DataReadRequest.Builder()
-                                .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                                .bucketByTime(1, TimeUnit.DAYS)
+                                        /*.aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                                .bucketByTime(1, TimeUnit.DAYS)*/
                                 .read(dataType)
                                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                                 .build()
                         )
+
+                //val pendingResult = Fitness.HistoryApi.readData(response, readRequest)
 
                 /// Fetch all data points for the specified DataType
                 val dataPoints = Tasks.await<DataReadResponse>(response).getDataSet(dataType)
