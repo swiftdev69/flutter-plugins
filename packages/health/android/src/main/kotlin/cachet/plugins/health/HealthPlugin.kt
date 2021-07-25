@@ -41,12 +41,14 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
     private var MOVE_MINUTES = "MOVE_MINUTES"
     private var DISTANCE_DELTA = "DISTANCE_DELTA"
 
-    var ESTIMATED_STEP_DELTAS: DataSource = DataSource.Builder()
+    var estimatedSteps: DataSource = DataSource.Builder()
             .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
             .setType(DataSource.TYPE_DERIVED)
             .setStreamName("estimated_steps")
             .setAppPackageName("com.google.android.gms")
             .build()
+
+
 
     companion object {
         @JvmStatic
@@ -173,20 +175,22 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         val dataType = keyToHealthDataType(type)
         val unit = getUnit(type)
 
+        var readRequest = DataReadRequest.Builder()
+                .aggregate(estimatedSteps, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                .setTimeRange(startTime, endTime, TimeUnit.SECONDS)
+                .bucketByTime(1, TimeUnit.DAYS)
+                .enableServerQueries()
+                .build()
+
         /// Start a new thread for doing a GoogleFit data lookup
         thread {
             try {
                 val fitnessOptions = FitnessOptions.builder().addDataType(dataType).build()
                 val googleSignInAccount = GoogleSignIn.getAccountForExtension(activity.applicationContext, fitnessOptions)
 
+
                 val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
-                        .readData(DataReadRequest.Builder()
-                                .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                                .bucketByTime(1, TimeUnit.DAYS)
-                                //.read(dataType)
-                                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                                .build()
-                        )
+                        .readData(readRequest)
 
                 /// Fetch all data points for the specified DataType
                 val dataPoints = Tasks.await<DataReadResponse>(response).getDataSet(dataType)
