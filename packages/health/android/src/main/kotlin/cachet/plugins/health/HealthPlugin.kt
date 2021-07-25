@@ -179,8 +179,8 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 .aggregate(estimatedSteps, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .setTimeRange(startTime, endTime, TimeUnit.SECONDS)
                 .bucketByTime(1, TimeUnit.DAYS)
-                .enableServerQueries()
                 .read(dataType)
+                .enableServerQueries()
                 .build()
 
         /// Start a new thread for doing a GoogleFit data lookup
