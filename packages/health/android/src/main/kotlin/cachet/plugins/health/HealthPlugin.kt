@@ -190,8 +190,11 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
 
                 val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
-                        .readData(DataReadRequest.Builder()
-                                .read(dataType)
+                        .readData(
+                                DataReadRequest.Builder()
+                                .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                                .bucketByTime(1, TimeUnit.DAYS)
+                                //.read(dataType)
                                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                                 .build()
                         )
