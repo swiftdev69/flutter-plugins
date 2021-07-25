@@ -41,7 +41,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
     private var MOVE_MINUTES = "MOVE_MINUTES"
     private var DISTANCE_DELTA = "DISTANCE_DELTA"
 
-    var estimatedSteps: DataSource = DataSource.Builder()
+    var ESTIMATED_STEP_DELTAS : DataSource = DataSource.Builder()
             .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
             .setType(DataSource.TYPE_DERIVED)
             .setStreamName("estimated_steps")
@@ -176,10 +176,9 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         val unit = getUnit(type)
 
         var readRequest = DataReadRequest.Builder()
-                .aggregate(estimatedSteps, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                .aggregate(ESTIMATED_STEP_DELTAS , DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .setTimeRange(startTime, endTime, TimeUnit.SECONDS)
                 .bucketByTime(1, TimeUnit.DAYS)
-                .read(dataType)
                 .enableServerQueries()
                 .build()
 
@@ -191,7 +190,13 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
 
                 val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
-                        .readData(readRequest)
+                        .readData(DataReadRequest.Builder()
+                                .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                                .bucketByTime(1, TimeUnit.DAYS)
+                                .read(dataType)
+                                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                                .build()
+                        )
 
                 /// Fetch all data points for the specified DataType
                 val dataPoints = Tasks.await<DataReadResponse>(response).getDataSet(dataType)
