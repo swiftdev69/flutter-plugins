@@ -225,7 +225,24 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .addOnSuccessListener { response ->
 
                             for (dataSet in response.buckets.flatMap { it.dataSets }) {
-                                dumpDataSet(dataSet)
+                                Log.i("DATA", "Data returned for Data type: ${dataSet.dataType.name}")
+                                for (dp in dataSet.dataPoints) {
+                                    Log.i("DATA","Data point:")
+                                    Log.i("DATA","\tType: ${dp.dataType.name}")
+                                    for (field in dp.dataType.fields) {
+                                        Log.i("DATA","\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+                                    }
+                                }
+
+                                val healthData = dataSet.dataPoints.mapIndexed { _, dataPoint ->
+                                    return@mapIndexed hashMapOf(
+                                            "value" to getHealthDataValue(dataPoint, unit),
+                                            "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
+                                            "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
+                                            "unit" to unit.toString()
+                                    )
+                                }
+                                activity.runOnUiThread { result.success(healthData) }
                             }
                             /*response.buckets
                                     .flatMap { it.dataSets }
