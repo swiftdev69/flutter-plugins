@@ -18,7 +18,10 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.ActivityResultListener
 import io.flutter.plugin.common.PluginRegistry.Registrar
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.concurrent.thread
 
 
@@ -43,11 +46,11 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
     private var MOVE_MINUTES = "MOVE_MINUTES"
     private var DISTANCE_DELTA = "DISTANCE_DELTA"
 
-    var ESTIMATED_STEP_DELTAS : DataSource = DataSource.Builder()
+    val datasource = DataSource.Builder()
+            .setAppPackageName("com.google.android.gms")
             .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
             .setType(DataSource.TYPE_DERIVED)
             .setStreamName("estimated_steps")
-            .setAppPackageName("com.google.android.gms")
             .build()
 
     private val runningQOrLater = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
@@ -174,16 +177,19 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         val startTime = call.argument<Long>("startDate")!!
         val endTime = call.argument<Long>("endDate")!!
 
+        Log.i("LOG IS THIS+++++++>", "Total steps: $startTime")
+        Log.i("LOG IS THIS+++++++>", "Total steps: $endTime")
+
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
         val unit = getUnit(type)
 
-        val readRequest: DataReadRequest = DataReadRequest.Builder()
-                .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                .setTimeRange(startTime, endTime, TimeUnit.SECONDS)
+        val request = DataReadRequest.Builder()
+                .aggregate(datasource,DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .bucketByTime(1, TimeUnit.DAYS)
-                .enableServerQueries()
+                .setTimeRange(startTime, endTime, TimeUnit.SECONDS)
                 .build()
+
 
 
         /// Start a new thread for doing a GoogleFit data lookup
@@ -193,6 +199,15 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 val fitnessOptions = FitnessOptions.builder().addDataType(dataType).build()
                 val googleSignInAccount = GoogleSignIn.getAccountForExtension(activity.applicationContext, fitnessOptions)
 
+                Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
+                        .readData(request)
+                        .addOnSuccessListener {response->
+                            val totalSteps = response.buckets
+                                    .flatMap { it.dataSets }
+                                    .flatMap { it.dataPoints }
+                                    .sumBy { it.getValue(Field.FIELD_STEPS).asInt() }
+                            Log.i("TAG dfsdfsdfdsf", "Total steps: $totalSteps")
+                        }
 
                 /*Fitness.getHistoryClient(activity.applicationContext,googleSignInAccount)
                         .readDailyTotal(dataType)
@@ -219,11 +234,11 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                             //Log.w(TAG, "There was a problem getting the step count.", e)
                         }*/
 
-                val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
+               /* val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
                         .readData(
                                 DataReadRequest.Builder()
-                                        /*.aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                                .bucketByTime(1, TimeUnit.DAYS)*/
+                                        *//*.aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                                .bucketByTime(1, TimeUnit.DAYS)*//*
                                 .read(dataType)
                                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                                 .build()
@@ -243,7 +258,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                             "unit" to unit.toString()
                     )
                 }
-                activity.runOnUiThread { result.success(healthData) }
+                activity.runOnUiThread { result.success(healthData) }*/
             } catch (e3: Exception) {
                 activity.runOnUiThread { result.success(null) }
             }
