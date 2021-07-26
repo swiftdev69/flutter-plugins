@@ -50,7 +50,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
             .setAppPackageName("com.google.android.gms")
             .build()
 
-
+    private val runningQOrLater = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
 
     companion object {
         @JvmStatic
@@ -153,7 +153,8 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
     /// Extracts the (numeric) value from a Health Data Point
     private fun getHealthDataValue(dataPoint: DataPoint, unit: Field): Any {
         return try {
-            dataPoint.getValue(unit).asFloat()
+            //dataPoint.getValue(unit).asFloat()
+            dataPoint.getValue(unit).asInt()
         } catch (e1: Exception) {
             try {
                 dataPoint.getValue(unit).asInt()
@@ -193,11 +194,36 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 val googleSignInAccount = GoogleSignIn.getAccountForExtension(activity.applicationContext, fitnessOptions)
 
 
-                val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
+                Fitness.getHistoryClient(activity.applicationContext,googleSignInAccount)
+                        .readDailyTotal(DataType.TYPE_STEP_COUNT_DELTA)
+                        .addOnSuccessListener { dataSet ->
+                            val total = when {
+                                dataSet.isEmpty -> 0
+                                else -> {
+                                    val healthData = dataSet.dataPoints.mapIndexed { _, dataPoint ->
+                                        return@mapIndexed hashMapOf(
+                                                "value" to getHealthDataValue(dataPoint, unit),
+                                                "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
+                                                "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
+                                                "unit" to unit.toString()
+                                        )
+                                    }
+                                    activity.runOnUiThread { result.success(healthData) }
+
+                                    dataSet.dataPoints.first().getValue(Field.FIELD_STEPS).asInt()
+                                }
+                            }
+                           Log.i("LOG IS THIS+++++++>", "Total steps: $total")
+                        }
+                        .addOnFailureListener { e ->
+                            //Log.w(TAG, "There was a problem getting the step count.", e)
+                        }
+
+                /*val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
                         .readData(
                                 DataReadRequest.Builder()
-                                        /*.aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                                .bucketByTime(1, TimeUnit.DAYS)*/
+                                        *//*.aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                                .bucketByTime(1, TimeUnit.DAYS)*//*
                                 .read(dataType)
                                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                                 .build()
@@ -216,9 +242,8 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                             "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
                             "unit" to unit.toString()
                     )
-
                 }
-                activity.runOnUiThread { result.success(healthData) }
+                activity.runOnUiThread { result.success(healthData) }*/
             } catch (e3: Exception) {
                 activity.runOnUiThread { result.success(null) }
             }
