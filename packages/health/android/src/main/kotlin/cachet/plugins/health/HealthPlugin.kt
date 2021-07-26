@@ -196,11 +196,10 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         val unit = getUnit(type)
 
         val request = DataReadRequest.Builder()
-                .aggregate(datasource,DataType.AGGREGATE_STEP_COUNT_DELTA)
+                .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .bucketByTime(1, TimeUnit.DAYS)
                 .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
                 .build()
-
 
 
         /// Start a new thread for doing a GoogleFit data lookup
@@ -212,13 +211,28 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                 Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
                         .readData(request)
-                        .addOnSuccessListener {response->
-                            val totalSteps = response.buckets
+                        .addOnSuccessListener { response ->
+                            response.buckets
                                     .flatMap { it.dataSets }
-                                    .flatMap { it.dataPoints }
-                                    .sumBy { it.getValue(Field.FIELD_STEPS).asInt() }
-                            Log.i("TAG dfsdfsdfdsf", "Total steps: $totalSteps")
+                                    .map {
+
+                                        val healthData = it.dataPoints.mapIndexed { _, dataPoint ->
+                                            return@mapIndexed hashMapOf(
+                                                    "value" to getHealthDataValue(dataPoint, unit),
+                                                    "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
+                                                    "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
+                                                    "unit" to unit.toString()
+                                            )
+                                        }
+
+                                        Log.i("TAG dfsdfsdfdsf", "Total steps: ${it.dataPoints.first().getValue(Field.FIELD_STEPS).asInt()}")
+
+                                        activity.runOnUiThread { result.success(healthData) }
+                                    }
+
+
                         }
+
 
                 /*Fitness.getHistoryClient(activity.applicationContext,googleSignInAccount)
                         .readDailyTotal(dataType)
@@ -245,10 +259,10 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                             //Log.w(TAG, "There was a problem getting the step count.", e)
                         }*/
 
-               /* val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
-                        .readData(
-                                DataReadRequest.Builder()
-                                        *//*.aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                /* val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
+                         .readData(
+                                 DataReadRequest.Builder()
+                                         *//*.aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
                                 .bucketByTime(1, TimeUnit.DAYS)*//*
                                 .read(dataType)
                                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
