@@ -174,6 +174,17 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         }
     }
 
+    fun dumpDataSet(dataSet: DataSet) {
+        Log.i("DATA", "Data returned for Data type: ${dataSet.dataType.name}")
+        for (dp in dataSet.dataPoints) {
+            Log.i("DATA","Data point:")
+            Log.i("DATA","\tType: ${dp.dataType.name}")
+            for (field in dp.dataType.fields) {
+                Log.i("DATA","\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
+            }
+        }
+    }
+
     /// Called when the "getHealthDataByType" is invoked from Flutter
     private fun getData(call: MethodCall, result: Result) {
         val type = call.argument<String>("dataTypeKey")!!
@@ -212,7 +223,11 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
                         .readData(request)
                         .addOnSuccessListener { response ->
-                            response.buckets
+
+                            for (dataSet in response.buckets.flatMap { it.dataSets }) {
+                                dumpDataSet(dataSet)
+                            }
+                            /*response.buckets
                                     .flatMap { it.dataSets }
                                     .map {
 
@@ -228,9 +243,10 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                         Log.i("TAG dfsdfsdfdsf", "Total steps: ${it.dataPoints.first().getValue(Field.FIELD_STEPS).asInt()}")
 
                                         activity.runOnUiThread { result.success(healthData) }
-                                    }
-
-
+                                    }*/
+                        }
+                        .addOnFailureListener { e ->
+                            Log.i("ERROR ","There was an error reading data from Google Fit", e)
                         }
 
 
