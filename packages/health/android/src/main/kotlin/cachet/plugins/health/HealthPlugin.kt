@@ -188,19 +188,21 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
     /// Called when the "getHealthDataByType" is invoked from Flutter
     private fun getData(call: MethodCall, result: Result) {
         val type = call.argument<String>("dataTypeKey")!!
-        val startTime = call.argument<Long>("startDate")!!
-        val endTime = call.argument<Long>("endDate")!!
+        val startTimeFromFlutter = call.argument<Long>("startDate")!!
+        val endTimeFromFlutter = call.argument<Long>("endDate")!!
 
-        /*val endTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val endTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             LocalDateTime.now().atZone(ZoneId.systemDefault())
         } else {
             TODO("VERSION.SDK_INT < O")
         }
 
         val startTime = endTime.minusDays(1)
-*/
-        Log.i("LOG IS THIS+++++++>", "Total steps: $startTime")
-        Log.i("LOG IS THIS+++++++>", "Total steps: $endTime")
+
+        Log.i("LOG IS THIS+++++++>", "Android: $startTime :seconds ${startTime.toEpochSecond()}")
+        Log.i("LOG IS THIS+++++++>", "Android: $endTime :seconds ${endTime.toEpochSecond()}" )
+        Log.i("LOG IS THIS+++++++>", "Flutter : $startTimeFromFlutter" )
+        Log.i("LOG IS THIS+++++++>", "Flutter : $endTimeFromFlutter" )
 
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
@@ -209,7 +211,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         val request = DataReadRequest.Builder()
                 .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .bucketByTime(1, TimeUnit.DAYS)
-                .setTimeRange(startTime, endTime, TimeUnit.SECONDS)
+                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
                 .build()
 
 
