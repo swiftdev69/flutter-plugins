@@ -196,11 +196,11 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         } else {
             TODO("VERSION.SDK_INT < O")
         }
+        val temp = LocalDateTime.now()
+        val startTime = LocalDateTime.of(temp.year,temp.month,temp.dayOfMonth,0,0,0).atZone(ZoneId.systemDefault())
 
-        val startTime = endTime.minusDays(1)
-
-        Log.i("LOG IS THIS+++++++>", "Android: $startTime :seconds ${startTime.toEpochSecond()}")
-        Log.i("LOG IS THIS+++++++>", "Android: $endTime :seconds ${endTime.toEpochSecond()}" )
+        Log.i("LOG IS THIS+++++++>", "Android : $startTime :seconds ${startTime.toEpochSecond()}")
+        Log.i("LOG IS THIS+++++++>", "Android : $endTime :seconds ${endTime.toEpochSecond()}" )
         Log.i("LOG IS THIS+++++++>", "Flutter : $startTimeFromFlutter" )
         Log.i("LOG IS THIS+++++++>", "Flutter : $endTimeFromFlutter" )
         Log.i("Cahger edaf sadsadas","sadsaddasdaddd" )
@@ -212,7 +212,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         val request = DataReadRequest.Builder()
                 .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .bucketByTime(1, TimeUnit.DAYS)
-                .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
+                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
                 .build()
 
 
