@@ -203,7 +203,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         Log.i("LOG IS THIS+++++++>", "Android : $endTime :seconds ${endTime.toEpochSecond()}" )
         Log.i("LOG IS THIS+++++++>", "Flutter : $startTimeFromFlutter" )
         Log.i("LOG IS THIS+++++++>", "Flutter : $endTimeFromFlutter" )
-        Log.i("Cahger edaf sadsadas","sadsaddasdaddd" )
 
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
