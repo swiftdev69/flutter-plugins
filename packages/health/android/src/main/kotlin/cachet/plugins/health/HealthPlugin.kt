@@ -188,17 +188,17 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
     /// Called when the "getHealthDataByType" is invoked from Flutter
     private fun getData(call: MethodCall, result: Result) {
         val type = call.argument<String>("dataTypeKey")!!
-        /*val startTime = call.argument<Long>("startDate")!!
+        val startTime = call.argument<Long>("startDate")!!
         val endTime = call.argument<Long>("endDate")!!
-*/
-        val endTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+        /*val endTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             LocalDateTime.now().atZone(ZoneId.systemDefault())
         } else {
             TODO("VERSION.SDK_INT < O")
         }
 
         val startTime = endTime.minusDays(1)
-
+*/
         Log.i("LOG IS THIS+++++++>", "Total steps: $startTime")
         Log.i("LOG IS THIS+++++++>", "Total steps: $endTime")
 
@@ -209,7 +209,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         val request = DataReadRequest.Builder()
                 .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .bucketByTime(1, TimeUnit.DAYS)
-                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                .setTimeRange(startTime, endTime, TimeUnit.SECONDS)
                 .build()
 
 
