@@ -154,6 +154,9 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
     /// Extracts the (numeric) value from a Health Data Point
     private fun getHealthDataValue(dataPoint: DataPoint, unit: Field): Any {
+
+        Log.e("in mehod","convert IS ${dataPoint.getValue(unit)} AND Field is $unit ")
+
         return try {
             dataPoint.getValue(unit).asFloat()
         } catch (e1: Exception) {
