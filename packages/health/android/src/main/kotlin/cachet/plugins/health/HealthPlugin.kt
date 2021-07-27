@@ -190,8 +190,8 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
         Log.i("LOG IS THIS+++++++>", "Android : $startTime :seconds ${startTime.toEpochSecond()}")
         Log.i("LOG IS THIS+++++++>", "Android : $endTime :seconds ${endTime.toEpochSecond()}" )
-        Log.i("LOG IS THIS+++++++>", "Flutter : $startTimeFromFlutter" )
-        Log.i("LOG IS THIS+++++++>", "Flutter : $endTimeFromFlutter" )
+        Log.i("LOG IS THIS+++++++>", "Flutter Change : $startTimeFromFlutter" )
+        Log.i("LOG IS THIS+++++++>", "Flutter Change  : $endTimeFromFlutter" )
 
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
@@ -200,7 +200,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         val request = DataReadRequest.Builder()
                 .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .bucketByTime(1, TimeUnit.DAYS)
-                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
                 .build()
 
 
