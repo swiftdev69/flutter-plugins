@@ -248,7 +248,9 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                             "unit" to unit.toString()
                                     )
                                 }
-                                activity.runOnUiThread { result.success(healthData) }
+                                if(dataSet.dataPoints != null) {
+                                    activity.runOnUiThread { result.success(healthData) }
+                                }
                             }
                         }
                         .addOnFailureListener { e ->
