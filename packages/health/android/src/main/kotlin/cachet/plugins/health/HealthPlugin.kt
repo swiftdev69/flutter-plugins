@@ -174,22 +174,12 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         }
     }
 
-    fun dumpDataSet(dataSet: DataSet) {
-        Log.i("DATA", "Data returned for Data type: ${dataSet.dataType.name}")
-        for (dp in dataSet.dataPoints) {
-            Log.i("DATA","Data point:")
-            Log.i("DATA","\tType: ${dp.dataType.name}")
-            for (field in dp.dataType.fields) {
-                Log.i("DATA","\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-            }
-        }
-    }
 
     /// Called when the "getHealthDataByType" is invoked from Flutter
     private fun getData(call: MethodCall, result: Result) {
         val type = call.argument<String>("dataTypeKey")!!
-        val startTimeFromFlutter = call.argument<Long>("startDate")!!
-        val endTimeFromFlutter = call.argument<Long>("endDate")!!
+        val startTimeFromFlutter = call.argument<Date>("startDate")!!
+        val endTimeFromFlutter = call.argument<Date>("endDate")!!
 
         val endTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             LocalDateTime.now().atZone(ZoneId.systemDefault())
@@ -203,6 +193,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         Log.i("LOG IS THIS+++++++>", "Android : $endTime :seconds ${endTime.toEpochSecond()}" )
         Log.i("LOG IS THIS+++++++>", "Flutter : $startTimeFromFlutter" )
         Log.i("LOG IS THIS+++++++>", "Flutter : $endTimeFromFlutter" )
+        Log.i("LOG IS THIS+++++++>", "Flutter : NEW UPDATED" )
 
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)

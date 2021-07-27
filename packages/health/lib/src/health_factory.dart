@@ -110,13 +110,13 @@ class HealthFactory {
   Future<List<HealthDataPoint>> _dataQuery(
       DateTime startDate, DateTime endDate, HealthDataType dataType) async {
 
-    print('NEW UPDATE CALL');
+    print('NEW UPDATE CALL AGAIN');
 
     // Set parameters for method channel request
     Map<String, dynamic> args = {
       'dataTypeKey': _enumToString(dataType),
-      'startDate': startDate.millisecond,
-      'endDate': endDate.millisecond
+      'startDate': startDate,
+      'endDate': endDate
     };
 
     List<HealthDataPoint> healthData = new List();
