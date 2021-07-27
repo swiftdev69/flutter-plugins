@@ -257,11 +257,11 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                 }
                             }
 
-                            activity.runOnUiThread { result.success(abc) }
+                            //activity.runOnUiThread { result.success(abc) }
 
 
 
-                            /*for (dataSet in response.buckets.flatMap { it.dataSets }) {
+                            for (dataSet in response.buckets.flatMap { it.dataSets }) {
                                 Log.i("DATA", "Data returned for Data type: ${dataSet.dataType.name}")
                                 Log.i("DATA", "Data returned for Data type: ${dataSet.dataPoints.size}")
 
@@ -276,7 +276,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                 if(dataSet.dataPoints.size > 0) {
                                     activity.runOnUiThread { result.success(healthData) }
                                 }
-                            }*/
+                            }
                         }
                         .addOnFailureListener { e ->
                             Log.i("ERROR ","There was an error reading data from Google Fit", e)
