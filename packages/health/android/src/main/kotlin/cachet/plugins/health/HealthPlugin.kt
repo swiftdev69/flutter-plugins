@@ -237,22 +237,24 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .readData(request)
                         .addOnSuccessListener { response ->
 
-                            val dataPoints = response.getDataSet(dataType)
+                            val healthData = response.buckets.flatMap {
+                                it.dataSets
+                            }.map {
+                                it.dataPoints.mapIndexed { _, dataPoint ->
 
-                            val healthData = dataPoints.dataPoints.mapIndexed { _, dataPoint ->
+                                    Log.i("DATA","Data point:")
+                                    Log.i("DATA","\tType: ${dataPoint.dataType.name}")
+                                    for (field in dataPoint.dataType.fields) {
+                                        Log.i("DATA","\tField: ${field.name.toString()} Value: ${dataPoint.getValue(field)}")
+                                    }
 
-                                Log.i("DATA","Data point:")
-                                Log.i("DATA","\tType: ${dataPoint.dataType.name}")
-                                for (field in dataPoint.dataType.fields) {
-                                    Log.i("DATA","\tField: ${field.name.toString()} Value: ${dataPoint.getValue(field)}")
+                                    return@mapIndexed hashMapOf(
+                                            "value" to getHealthDataValue(dataPoint, unit),
+                                            "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
+                                            "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
+                                            "unit" to unit.toString()
+                                    )
                                 }
-
-                                return@mapIndexed hashMapOf(
-                                        "value" to getHealthDataValue(dataPoint, unit),
-                                        "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
-                                        "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
-                                        "unit" to unit.toString()
-                                )
                             }
                             activity.runOnUiThread { result.success(healthData) }
 
