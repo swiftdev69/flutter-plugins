@@ -240,7 +240,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .addOnSuccessListener { response ->
 
 
-                            val ab = response.buckets.flatMap {
+                            /*val ab = response.buckets.flatMap {
                                 it.dataSets
                             }
 
@@ -257,7 +257,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                 }
                             }
 
-                            //activity.runOnUiThread { result.success(abc) }
+                            activity.runOnUiThread { result.success(abc) }*/
 
 
 
