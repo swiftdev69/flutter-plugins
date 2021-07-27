@@ -155,8 +155,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
     /// Extracts the (numeric) value from a Health Data Point
     private fun getHealthDataValue(dataPoint: DataPoint, unit: Field): Any {
 
-        Log.e("in mehod","convert IS ${dataPoint.getValue(unit)} AND Field is $unit ")
-
         return try {
             dataPoint.getValue(unit).asFloat()
         } catch (e1: Exception) {
@@ -204,16 +202,15 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         val dataType = keyToHealthDataType(type)
         val unit = getUnit(type)
 
-        val request = DataReadRequest.Builder()
-                .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                .bucketByTime(1, TimeUnit.DAYS)
-                .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
-                .build()
-
-
         /// Start a new thread for doing a GoogleFit data lookup
         thread {
             try {
+
+                val request = DataReadRequest.Builder()
+                        .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                        .bucketByTime(1, TimeUnit.DAYS)
+                        .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
+                        .build()
 
                 val fitnessOptions = FitnessOptions.builder().addDataType(dataType).build()
                 val googleSignInAccount = GoogleSignIn.getAccountForExtension(activity.applicationContext, fitnessOptions)
@@ -258,8 +255,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                             }
 
                             activity.runOnUiThread { result.success(abc) }*/
-
-
 
                             for (dataSet in response.buckets.flatMap { it.dataSets }) {
                                 Log.i("DATA", "Data returned for Data type: ${dataSet.dataType.name}")
