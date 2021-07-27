@@ -16,7 +16,10 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.ActivityResultListener
 import io.flutter.plugin.common.PluginRegistry.Registrar
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.concurrent.thread
 
 
@@ -201,10 +204,17 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         val dataType = keyToHealthDataType(type)
         val unit = getUnit(type)
 
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        val now = Date()
+        calendar.time = now
+        val endTime = calendar.timeInMillis
+        calendar.add(Calendar.WEEK_OF_YEAR, -1)
+        val startTime = calendar.timeInMillis
+
         val request = DataReadRequest.Builder()
                 .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .bucketByTime(1, TimeUnit.DAYS)
-                .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
+                .setTimeRange(startTime, endTime, TimeUnit.SECONDS)
                 //.setTimeRange(1627324200, 1627370309, TimeUnit.MILLISECONDS)
                 .build()
 
