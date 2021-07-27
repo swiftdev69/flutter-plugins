@@ -204,18 +204,10 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         val dataType = keyToHealthDataType(type)
         val unit = getUnit(type)
 
-       /* val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        val now = Date()
-        calendar.time = now
-        val endTime = calendar.timeInMillis
-        calendar.add(Calendar.WEEK_OF_YEAR, -1)
-        val startTime = calendar.timeInMillis*/
-
         val request = DataReadRequest.Builder()
                 .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .bucketByTime(1, TimeUnit.DAYS)
                 .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
-                //.setTimeRange(1627324200, 1627370309, TimeUnit.MILLISECONDS)
                 .build()
 
 
@@ -259,7 +251,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                             "unit" to unit.toString()
                                     )
                                 }
-                                if(dataSet.dataPoints != null) {
+                                if(dataSet.dataPoints.size > 0) {
                                     activity.runOnUiThread { result.success(healthData) }
                                 }
                             }
