@@ -112,11 +112,18 @@ class HealthFactory {
 
     print('NEW UPDATE CALL');
 
+    var newDate = startDate.millisecondsSinceEpoch.toStringAsFixed(10);
+    double.parse(newDate);
+
+    var end = endDate.millisecondsSinceEpoch.toStringAsFixed(10);
+    double.parse(end);
+
+
     // Set parameters for method channel request
     Map<String, dynamic> args = {
       'dataTypeKey': _enumToString(dataType),
-      'startDate': startDate.millisecondsSinceEpoch,
-      'endDate': endDate.millisecondsSinceEpoch
+      'startDate': double.parse(startDate.millisecondsSinceEpoch.toStringAsFixed(10)),
+      'endDate': double.parse(endDate.millisecondsSinceEpoch.toStringAsFixed(10))
     };
 
     List<HealthDataPoint> healthData = new List();
