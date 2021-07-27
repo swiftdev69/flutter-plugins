@@ -250,7 +250,10 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     )
                                 }
                                 if(dataSet.dataPoints.size > 0) {
-                                    activity.runOnUiThread { result.success(healthData) }
+                                    activity.runOnUiThread {
+                                        result.success(healthData)
+                                        Thread.interrupted()
+                                    }
                                 }
                             }
                         }
@@ -284,6 +287,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                     )
                 }
                 activity.runOnUiThread { result.success(healthData) }*/
+
             } catch (e3: Exception) {
                 activity.runOnUiThread { result.success(null) }
             }
