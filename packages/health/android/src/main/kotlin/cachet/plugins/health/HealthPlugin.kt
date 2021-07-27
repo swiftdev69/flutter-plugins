@@ -233,11 +233,30 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 }
                 activity.runOnUiThread { result.success(healthData) }*/
 
-                val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
+                Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
                         .readData(request)
                         .addOnSuccessListener { response ->
 
-                            for (dataSet in response.buckets.flatMap { it.dataSets }) {
+                            val dataPoints = response.getDataSet(dataType)
+
+                            val healthData = dataPoints.dataPoints.mapIndexed { _, dataPoint ->
+
+                                Log.i("DATA","Data point:")
+                                Log.i("DATA","\tType: ${dataPoint.dataType.name}")
+                                for (field in dataPoint.dataType.fields) {
+                                    Log.i("DATA","\tField: ${field.name.toString()} Value: ${dataPoint.getValue(field)}")
+                                }
+
+                                return@mapIndexed hashMapOf(
+                                        "value" to getHealthDataValue(dataPoint, unit),
+                                        "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
+                                        "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
+                                        "unit" to unit.toString()
+                                )
+                            }
+                            activity.runOnUiThread { result.success(healthData) }
+
+                            /*for (dataSet in response.buckets.flatMap { it.dataSets }) {
                                 Log.i("DATA", "Data returned for Data type: ${dataSet.dataType.name}")
                                 for (dp in dataSet.dataPoints) {
                                     Log.i("DATA","Data point:")
@@ -256,7 +275,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     )
                                 }
                                 activity.runOnUiThread { result.success(healthData) }
-                            }
+                            }*/
                         }
                         .addOnFailureListener { e ->
                             Log.i("ERROR ","There was an error reading data from Google Fit", e)
@@ -330,30 +349,10 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
     override fun onMethodCall(call: MethodCall, result: Result) {
         when (call.method) {
             "requestAuthorization" -> requestAuthorization(call, result)
-            "getData" -> channel.setMethodCallHandler { rowCall, rowResult ->  getData(rowCall, rowResult)}
+            "getData" -> getData(call, result)
             else -> result.notImplemented()
         }
     }
-}
-
-class MethodResultWrapper internal constructor(private val methodResult: MethodChannel.Result) : MethodChannel.Result {
-    private val handler: Handler = Handler(Looper.getMainLooper())
-    override fun success(result: Any?) {
-        handler.post(
-                Runnable { methodResult.success(result) })
-    }
-
-    override fun error(
-            errorCode: String, errorMessage: String?, errorDetails: Any?) {
-        handler.post(
-                Runnable { methodResult.error(errorCode, errorMessage, errorDetails) })
-    }
-
-    override fun notImplemented() {
-        handler.post(
-                Runnable { methodResult.notImplemented() })
-    }
-
 }
 
 /*
