@@ -2,24 +2,20 @@ package cachet.plugins.health
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Build
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.*
 import com.google.android.gms.fitness.request.DataReadRequest
-import com.google.android.gms.fitness.result.DataReadResponse
-import com.google.android.gms.tasks.Tasks
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.ActivityResultListener
 import io.flutter.plugin.common.PluginRegistry.Registrar
-import java.time.LocalDateTime
-import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
@@ -61,6 +57,9 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
             val plugin = HealthPlugin(registrar.activity(), channel)
             registrar.addActivityResultListener(plugin)
             channel.setMethodCallHandler(plugin)
+            /*channel.setMethodCallHandler { call, result ->
+                    val result: Result = MethodResultWrapper(result)
+            }*/
         }
     }
 
@@ -331,11 +330,32 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
     override fun onMethodCall(call: MethodCall, result: Result) {
         when (call.method) {
             "requestAuthorization" -> requestAuthorization(call, result)
-            "getData" -> getData(call, result)
+            "getData" -> channel.setMethodCallHandler { rowCall, rowResult ->  getData(rowCall, rowResult)}
             else -> result.notImplemented()
         }
     }
 }
+
+class MethodResultWrapper internal constructor(private val methodResult: MethodChannel.Result) : MethodChannel.Result {
+    private val handler: Handler = Handler(Looper.getMainLooper())
+    override fun success(result: Any?) {
+        handler.post(
+                Runnable { methodResult.success(result) })
+    }
+
+    override fun error(
+            errorCode: String, errorMessage: String?, errorDetails: Any?) {
+        handler.post(
+                Runnable { methodResult.error(errorCode, errorMessage, errorDetails) })
+    }
+
+    override fun notImplemented() {
+        handler.post(
+                Runnable { methodResult.notImplemented() })
+    }
+
+}
+
 /*
 
 ///fetch only current date date
