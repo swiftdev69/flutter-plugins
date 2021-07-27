@@ -236,28 +236,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .readData(request)
                         .addOnSuccessListener { response ->
 
-                            val healthData = response.buckets.flatMap {
-                                it.dataSets
-                            }.map {
-                                it.dataPoints.mapIndexed { _, dataPoint ->
-
-                                    Log.i("DATA","Data point:")
-                                    Log.i("DATA","\tType: ${dataPoint.dataType.name}")
-                                    for (field in dataPoint.dataType.fields) {
-                                        Log.i("DATA","\tField: ${field.name.toString()} Value: ${dataPoint.getValue(field)}")
-                                    }
-
-                                    return@mapIndexed hashMapOf(
-                                            "value" to getHealthDataValue(dataPoint, unit),
-                                            "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
-                                            "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
-                                            "unit" to unit.toString()
-                                    )
-                                }
-                            }
-                            activity.runOnUiThread { result.success(healthData) }
-
-                           /* for (dataSet in response.buckets.flatMap { it.dataSets }) {
+                            for (dataSet in response.buckets.flatMap { it.dataSets }) {
                                 Log.i("DATA", "Data returned for Data type: ${dataSet.dataType.name}")
 
                                 val healthData = dataSet.dataPoints.mapIndexed { _, dataPoint ->
@@ -269,7 +248,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     )
                                 }
                                 activity.runOnUiThread { result.success(healthData) }
-                            }*/
+                            }
                         }
                         .addOnFailureListener { e ->
                             Log.i("ERROR ","There was an error reading data from Google Fit", e)
