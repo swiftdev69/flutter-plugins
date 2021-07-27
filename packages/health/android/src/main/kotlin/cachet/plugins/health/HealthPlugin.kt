@@ -214,7 +214,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         val request = DataReadRequest.Builder()
                 .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .bucketByTime(1, TimeUnit.DAYS)
-                .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
+                .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
                 //.setTimeRange(1627324200, 1627370309, TimeUnit.MILLISECONDS)
                 .build()
 
