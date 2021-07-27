@@ -236,13 +236,29 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .readData(request)
                         .addOnSuccessListener { response ->
 
-                            response.buckets.flatMap {
+
+                            val ab = response.buckets.flatMap {
                                 it.dataSets
-                            }.map {
+                            }
+
+                            val abc = ab.map {
                                 Log.i("DATA", "ONY TEST DATA IN MAP : ${it.dataPoints.size}")
 
+                                it.dataPoints.mapIndexed { _, dataPoint ->
+                                    return@mapIndexed hashMapOf(
+                                            "value" to getHealthDataValue(dataPoint, unit),
+                                            "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
+                                            "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
+                                            "unit" to unit.toString()
+                                    )
+                                }
                             }
-                            for (dataSet in response.buckets.flatMap { it.dataSets }) {
+
+                            activity.runOnUiThread { result.success(abc) }
+
+
+
+                            /*for (dataSet in response.buckets.flatMap { it.dataSets }) {
                                 Log.i("DATA", "Data returned for Data type: ${dataSet.dataType.name}")
                                 Log.i("DATA", "Data returned for Data type: ${dataSet.dataPoints.size}")
 
@@ -257,7 +273,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                 if(dataSet.dataPoints.size > 0) {
                                     activity.runOnUiThread { result.success(healthData) }
                                 }
-                            }
+                            }*/
                         }
                         .addOnFailureListener { e ->
                             Log.i("ERROR ","There was an error reading data from Google Fit", e)
