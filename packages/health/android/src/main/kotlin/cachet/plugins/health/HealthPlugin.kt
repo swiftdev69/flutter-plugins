@@ -174,12 +174,11 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         }
     }
 
-
     /// Called when the "getHealthDataByType" is invoked from Flutter
     private fun getData(call: MethodCall, result: Result) {
         val type = call.argument<String>("dataTypeKey")!!
-        val startTimeFromFlutter = call.argument<Date>("startDate")!!
-        val endTimeFromFlutter = call.argument<Date>("endDate")!!
+        val startTimeFromFlutter = call.argument<Long>("startDate")!!
+        val endTimeFromFlutter = call.argument<Long>("endDate")!!
 
         val endTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             LocalDateTime.now().atZone(ZoneId.systemDefault())
@@ -193,7 +192,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         Log.i("LOG IS THIS+++++++>", "Android : $endTime :seconds ${endTime.toEpochSecond()}" )
         Log.i("LOG IS THIS+++++++>", "Flutter : $startTimeFromFlutter" )
         Log.i("LOG IS THIS+++++++>", "Flutter : $endTimeFromFlutter" )
-        Log.i("LOG IS THIS+++++++>", "Flutter : NEW UPDATED" )
 
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
