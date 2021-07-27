@@ -217,7 +217,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 val fitnessOptions = FitnessOptions.builder().addDataType(dataType).build()
                 val googleSignInAccount = GoogleSignIn.getAccountForExtension(activity.applicationContext, fitnessOptions)
 
-                val  response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
+                /*val  response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
                         .readData(request);
 
                 /// Fetch all data points for the specified DataType
@@ -232,9 +232,9 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                             "unit" to unit.toString()
                     )
                 }
-                activity.runOnUiThread { result.success(healthData) }
+                activity.runOnUiThread { result.success(healthData) }*/
 
-              /*  Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
+                val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
                         .readData(request)
                         .addOnSuccessListener { response ->
 
@@ -263,7 +263,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                             Log.i("ERROR ","There was an error reading data from Google Fit", e)
                         }
 
-*/
+
 
 
                 /* val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
