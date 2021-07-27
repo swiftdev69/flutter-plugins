@@ -190,9 +190,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         Log.i("LOG IS THIS+++++++>", "Android : $endTime :seconds ${endTime.toEpochSecond()}" )
 */
 
-        Log.i("LOG IS THIS+++++++>", "Flutter : $startTimeFromFlutter" )
-        Log.i("LOG IS THIS+++++++>", "Flutter  : $endTimeFromFlutter" )
-
         startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter,3)
         endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter,3)
 
@@ -239,6 +236,12 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .readData(request)
                         .addOnSuccessListener { response ->
 
+                            response.buckets.flatMap {
+                                it.dataSets
+                            }.map {
+                                Log.i("DATA", "ONY TEST DATA IN MAP : ${it.dataPoints.size}")
+
+                            }
                             for (dataSet in response.buckets.flatMap { it.dataSets }) {
                                 Log.i("DATA", "Data returned for Data type: ${dataSet.dataType.name}")
                                 Log.i("DATA", "Data returned for Data type: ${dataSet.dataPoints.size}")
