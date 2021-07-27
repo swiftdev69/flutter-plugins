@@ -10,9 +10,6 @@ import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.*
 import com.google.android.gms.fitness.request.DataReadRequest
-import com.google.android.gms.fitness.result.DataReadResponse
-import com.google.android.gms.fitness.result.DataReadResult
-import com.google.android.gms.tasks.Tasks
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
@@ -21,10 +18,7 @@ import io.flutter.plugin.common.PluginRegistry.ActivityResultListener
 import io.flutter.plugin.common.PluginRegistry.Registrar
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import kotlin.concurrent.thread
 
 
@@ -173,12 +167,15 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
             }
         }
     }
+    fun removeLastNDigits(x: Long, n: Long): Long {
+        return (x / Math.pow(10.0, n.toDouble())).toLong()
+    }
 
     /// Called when the "getHealthDataByType" is invoked from Flutter
     private fun getData(call: MethodCall, result: Result) {
         val type = call.argument<String>("dataTypeKey")!!
-        val startTimeFromFlutter = call.argument<Long>("startDate")!!
-        val endTimeFromFlutter = call.argument<Long>("endDate")!!
+        var startTimeFromFlutter = call.argument<Long>("startDate")!!
+        var endTimeFromFlutter = call.argument<Long>("endDate")!!
 
         val endTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             LocalDateTime.now().atZone(ZoneId.systemDefault())
@@ -187,6 +184,12 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         }
         val temp = LocalDateTime.now()
         val startTime = LocalDateTime.of(temp.year,temp.month,temp.dayOfMonth,0,0,0).atZone(ZoneId.systemDefault())
+
+        Log.i("LOG IS THIS+++++++>", "Flutter : $startTimeFromFlutter" )
+        Log.i("LOG IS THIS+++++++>", "Flutter  : $endTimeFromFlutter" )
+
+        startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter,3)
+        endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter,3)
 
         Log.i("LOG IS THIS+++++++>", "Android : $startTime :seconds ${startTime.toEpochSecond()}")
         Log.i("LOG IS THIS+++++++>", "Android : $endTime :seconds ${endTime.toEpochSecond()}" )
