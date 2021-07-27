@@ -152,8 +152,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
     /// Extracts the (numeric) value from a Health Data Point
     private fun getHealthDataValue(dataPoint: DataPoint, unit: Field): Any {
         return try {
-            //dataPoint.getValue(unit).asFloat()
-            dataPoint.getValue(unit).asInt()
+            dataPoint.getValue(unit).asFloat()
         } catch (e1: Exception) {
             try {
                 dataPoint.getValue(unit).asInt()
@@ -237,7 +236,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .readData(request)
                         .addOnSuccessListener { response ->
 
-                           /* val healthData = response.buckets.flatMap {
+                            val healthData = response.buckets.flatMap {
                                 it.dataSets
                             }.map {
                                 it.dataPoints.mapIndexed { _, dataPoint ->
@@ -256,17 +255,10 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     )
                                 }
                             }
-                            activity.runOnUiThread { result.success(healthData) }*/
+                            activity.runOnUiThread { result.success(healthData) }
 
-                            for (dataSet in response.buckets.flatMap { it.dataSets }) {
+                           /* for (dataSet in response.buckets.flatMap { it.dataSets }) {
                                 Log.i("DATA", "Data returned for Data type: ${dataSet.dataType.name}")
-                                for (dp in dataSet.dataPoints) {
-                                    Log.i("DATA","Data point:")
-                                    Log.i("DATA","\tType: ${dp.dataType.name}")
-                                    for (field in dp.dataType.fields) {
-                                        Log.i("DATA","\tField: ${field.name.toString()} Value: ${dp.getValue(field)}")
-                                    }
-                                }
 
                                 val healthData = dataSet.dataPoints.mapIndexed { _, dataPoint ->
                                     return@mapIndexed hashMapOf(
@@ -277,7 +269,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     )
                                 }
                                 activity.runOnUiThread { result.success(healthData) }
-                            }
+                            }*/
                         }
                         .addOnFailureListener { e ->
                             Log.i("ERROR ","There was an error reading data from Google Fit", e)
