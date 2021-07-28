@@ -182,17 +182,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         var startTimeFromFlutter = call.argument<Long>("startDate")!!
         var endTimeFromFlutter = call.argument<Long>("endDate")!!
 
-       /* val endTime = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            LocalDateTime.now().atZone(ZoneId.systemDefault())
-        } else {
-            TODO("VERSION.SDK_INT < O")
-        }
-        val temp = LocalDateTime.now()
-        val startTime = LocalDateTime.of(temp.year,temp.month,temp.dayOfMonth,0,0,0).atZone(ZoneId.systemDefault())
-         Log.i("LOG IS THIS+++++++>", "Android : $startTime :seconds ${startTime.toEpochSecond()}")
-        Log.i("LOG IS THIS+++++++>", "Android : $endTime :seconds ${endTime.toEpochSecond()}" )
-*/
-
         startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter,3)
         endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter,3)
 
@@ -256,6 +245,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     }
                                 }
                             }
+                            activity.runOnUiThread { result.success(null) }
                         }
                         .addOnFailureListener { e ->
                             Log.i("ERROR ","There was an error reading data from Google Fit", e)
