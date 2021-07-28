@@ -178,7 +178,9 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         val type = call.argument<String>("dataTypeKey")!!
         var startTimeFromFlutter = call.argument<Long>("startDate")!!
         var endTimeFromFlutter = call.argument<Long>("endDate")!!
-
+        
+        Log.i("LOG IS THIS+++++++>", "Flutter Change : $startTimeFromFlutter" )
+        Log.i("LOG IS THIS+++++++>", "Flutter Change  : $endTimeFromFlutter" )
         startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter,3)
         endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter,3)
 
@@ -243,9 +245,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .addOnFailureListener { e ->
                             Log.i("ERROR ","There was an error reading data from Google Fit", e)
                         }
-
-
-
 
 
                 ///OLD CODE ENDS
