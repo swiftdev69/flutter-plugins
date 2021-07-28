@@ -180,11 +180,15 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         var endTimeFromFlutter = call.argument<Long>("endDate")!!
 
         val diffInMillisec = endTimeFromFlutter - startTimeFromFlutter
-        val diffInDays : Int = TimeUnit.MILLISECONDS.toDays(diffInMillisec).toInt()
+        var diffInDays : Int = TimeUnit.MILLISECONDS.toDays(diffInMillisec).toInt()
+
+        if (diffInDays == 0){
+            diffInDays = 1;
+        }
 
         Log.i("LOG IS THIS+++++++>", "Flutter Change : $startTimeFromFlutter" )
         Log.i("LOG IS THIS+++++++>", "Flutter Change  : $endTimeFromFlutter" )
-        Log.i("DIFFERENCE BY Yo+++>", "Flutter Change  : $diffInMillisec : DIFFE IN DAY $diffInDays" )
+        Log.i("DIFFERENCE BY Yo+++>", "Flutter  Change  : $diffInMillisec : DIFFE IN DAY $diffInDays" )
 
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
