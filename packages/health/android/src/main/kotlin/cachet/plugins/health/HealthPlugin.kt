@@ -187,16 +187,16 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 //        endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter,3)
 
 
-        val diffInMillisec = endTimeFromFlutter - startTimeFromFlutter
-        var diffInDays : Int = TimeUnit.MILLISECONDS.toDays(diffInMillisec).toInt()
-
-        if (diffInDays == 0){
-            diffInDays = 1
-        }
+//        val diffInMillisec = endTimeFromFlutter - startTimeFromFlutter
+//        var diffInDays : Int = TimeUnit.MILLISECONDS.toDays(diffInMillisec).toInt()
+//
+//        if (diffInDays == 0){
+//            diffInDays = 1
+//        }
 
         Log.i("LOG IS THIS+++++++>", "Flutter Change : $startTimeFromFlutter" )
         Log.i("LOG IS THIS+++++++>", "Flutter Change  : $endTimeFromFlutter" )
-        Log.i("DIFFERENCE BY Yo+++>", "Flutter  Change  : $diffInMillisec : DIFFE IN DAY $diffInDays" )
+//        Log.i("DIFFERENCE BY Yo+++>", "Flutter  Change  : $diffInMillisec : DIFFE IN DAY $diffInDays" )
 
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
@@ -268,7 +268,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                             "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
                             "unit" to unit.toString()
                     )
-
                 }
                 activity.runOnUiThread { result.success(healthData) }
                 ///OLD CODE ENDS
