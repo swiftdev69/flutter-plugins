@@ -176,13 +176,15 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
     /// Called when the "getHealthDataByType" is invoked from Flutter
     private fun getData(call: MethodCall, result: Result) {
         val type = call.argument<String>("dataTypeKey")!!
-        val startTimeFromFlutter = call.argument<Long>("startDate")!!
-        val endTimeFromFlutter = call.argument<Long>("endDate")!!
+        var startTimeFromFlutter = call.argument<Long>("startDate")!!
+        var endTimeFromFlutter = call.argument<Long>("endDate")!!
 
         val diffInMillisec = endTimeFromFlutter - startTimeFromFlutter
         val diffInDays : Int = TimeUnit.MILLISECONDS.toDays(diffInMillisec).toInt()
+
         Log.i("LOG IS THIS+++++++>", "Flutter Change : $startTimeFromFlutter" )
         Log.i("LOG IS THIS+++++++>", "Flutter Change  : $endTimeFromFlutter" )
+        Log.i("DIFFERENCE BY Yo+++>", "Flutter Change  : $diffInMillisec : DIFFE IN DAY $diffInDays" )
 
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
@@ -208,24 +210,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .readData(request)
                         .addOnSuccessListener { response ->
 
-                            val  healthData = response.buckets
-                                    .flatMap { it.dataSets }
-                                    .flatMap {
-                                        it.dataPoints
-                                    }.map {
-                                        hashMapOf(
-                                                "value" to getHealthDataValue(it, unit),
-                                                "date_from" to it.getStartTime(TimeUnit.MILLISECONDS),
-                                                "date_to" to it.getEndTime(TimeUnit.MILLISECONDS),
-                                                "unit" to unit.toString()
-                                        )
-                                    }
-
-                            activity.runOnUiThread {
-                                result.success(healthData)
-                            }
-
-                            /*for (dataSet in response.buckets.flatMap { it.dataSets }) {
+                            for (dataSet in response.buckets.flatMap { it.dataSets }) {
                                 Log.i("DATA", "Data returned for Data type: ${dataSet.dataType.name}")
                                 Log.i("DATA", "Data returned for Data type: ${dataSet.dataPoints.size}")
 
@@ -245,7 +230,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     }
                                 }
 
-                            }*/
+                            }
 
                         }
                         .addOnFailureListener { e ->
