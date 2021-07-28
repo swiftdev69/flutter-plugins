@@ -209,7 +209,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                 val request = DataReadRequest.Builder()
                         .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                        .bucketByTime(diffInDays, TimeUnit.DAYS)
+                        .bucketByTime(1, TimeUnit.DAYS)
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
                         .build()
 
@@ -237,11 +237,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                             }
                             result.success(dataList)
 
-                            response.buckets
-                                    .map {
-                                        it.dataSets
-                                    }
-                            for (dataSet in response.buckets.flatMap { it.dataSets }) {
+/*                            for (dataSet in response.buckets.flatMap { it.dataSets }) {
                                 Log.i("DATA", "Data returned for Data type: ${dataSet.dataType.name}")
                                 Log.i("DATA", "Data returned for Data type: ${dataSet.dataPoints.size}")
 
@@ -261,7 +257,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     }
                                 }
 
-                            }
+                            }*/
 
                         }
                         .addOnFailureListener { e ->
