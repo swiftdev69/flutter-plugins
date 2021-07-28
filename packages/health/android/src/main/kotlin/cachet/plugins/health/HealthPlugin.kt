@@ -179,11 +179,15 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         var startTimeFromFlutter = call.argument<Long>("startDate")!!
         var endTimeFromFlutter = call.argument<Long>("endDate")!!
 
+        startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter,3)
+        endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter,3)
+
+
         val diffInMillisec = endTimeFromFlutter - startTimeFromFlutter
         var diffInDays : Int = TimeUnit.MILLISECONDS.toDays(diffInMillisec).toInt()
 
         if (diffInDays == 0){
-            diffInDays = 1;
+            diffInDays = 1
         }
 
         Log.i("LOG IS THIS+++++++>", "Flutter Change : $startTimeFromFlutter" )
@@ -202,10 +206,9 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                 ///NEW CODE START
 
-
                 val request = DataReadRequest.Builder()
-                                .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                                   .bucketByTime(diffInDays, TimeUnit.DAYS)
+                        .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                        .bucketByTime(diffInDays, TimeUnit.DAYS)
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
                         .build()
 
