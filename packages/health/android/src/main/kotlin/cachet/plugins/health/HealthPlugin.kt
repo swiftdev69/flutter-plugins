@@ -245,7 +245,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     }
                                 }
                             }
-                            activity.runOnUiThread { result.success(null) }
+
                         }
                         .addOnFailureListener { e ->
                             Log.i("ERROR ","There was an error reading data from Google Fit", e)
