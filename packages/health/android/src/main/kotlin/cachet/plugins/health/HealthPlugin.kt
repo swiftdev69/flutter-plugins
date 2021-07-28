@@ -238,10 +238,11 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                             "unit" to unit.toString()
                                     )
                                 }
+                                Log.i("Helath Data", "Data : ${healthData.toString()}")
+
                                 if(dataSet.dataPoints.size > 0) {
                                     activity.runOnUiThread {
                                         result.success(healthData)
-                                        return@runOnUiThread
                                     }
                                 }
                             }
