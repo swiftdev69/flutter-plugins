@@ -255,8 +255,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 val response =Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount).readData(
                         DataReadRequest.Builder()
                                 .read(dataType)
-                                .bucketByTime(1, TimeUnit.DAYS)
-                                .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
+                                .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
                                 .build()
                 )
 
