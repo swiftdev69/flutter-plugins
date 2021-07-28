@@ -9,6 +9,8 @@ import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.*
 import com.google.android.gms.fitness.request.DataReadRequest
+import com.google.android.gms.fitness.result.DataReadResponse
+import com.google.android.gms.tasks.Tasks
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
@@ -181,8 +183,8 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
         Log.i("LOG IS THIS+++++++>", "Flutter Change : $startTimeFromFlutter" )
         Log.i("LOG IS THIS+++++++>", "Flutter Change  : $endTimeFromFlutter" )
-//        startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter,3)
-//        endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter,3)
+        startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter,3)
+        endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter,3)
 
 
         val diffInMillisec = endTimeFromFlutter - startTimeFromFlutter
@@ -250,12 +252,11 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 ///OLD CODE ENDS
 
                 ///OLD CODE START
-                val response =Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount).readData(
-                        DataReadRequest.Builder()
+                val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
+                        .readData(DataReadRequest.Builder()
                                 .read(dataType)
                                 .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
-                                .build()
-                )
+                                .build())
 
                 /// Fetch all data points for the specified DataType
                 val dataPoints = Tasks.await<DataReadResponse>(response).getDataSet(dataType)
@@ -268,6 +269,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                             "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
                             "unit" to unit.toString()
                     )
+
                 }
                 activity.runOnUiThread { result.success(healthData) }
                 ///OLD CODE ENDS
