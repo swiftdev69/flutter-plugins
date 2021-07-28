@@ -256,7 +256,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         DataReadRequest.Builder()
                                 .read(dataType)
                                 .bucketByTime(1, TimeUnit.DAYS)
-                                .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
+                                .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
                                 .build()
                 )
 
