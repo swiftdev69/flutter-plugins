@@ -3,7 +3,6 @@ package cachet.plugins.health
 import android.app.Activity
 import android.content.Intent
 import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.fitness.Fitness
@@ -18,8 +17,6 @@ import io.flutter.plugin.common.PluginRegistry.ActivityResultListener
 import io.flutter.plugin.common.PluginRegistry.Registrar
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import kotlin.concurrent.thread
 
 
@@ -186,8 +183,20 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter,3)
 
 
+        val startTemp = Date(startTimeFromFlutter)
+        val endTemp = Date(endTimeFromFlutter)
+
+        val startDays : Int = (startTimeFromFlutter / (1000*60*60*24)).toInt()
+        val endDays : Int = (endTimeFromFlutter / (1000*60*60*24)).toInt()
+
+        var difference : Int = endDays - startDays;
+
+        if(difference == 0){
+           difference = 1;
+        }
         Log.i("LOG IS THIS+++++++>", "Flutter Change : $startTimeFromFlutter" )
         Log.i("LOG IS THIS+++++++>", "Flutter Change  : $endTimeFromFlutter" )
+        Log.i("LOG IS THIS+++++++>", "Difference date  : ${endDays - startDays}" )
 
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
@@ -198,7 +207,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                 val request = DataReadRequest.Builder()
                         .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                        .bucketByTime(4, TimeUnit.DAYS)
+                        .bucketByTime(difference, TimeUnit.DAYS)
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
                         .build()
 
