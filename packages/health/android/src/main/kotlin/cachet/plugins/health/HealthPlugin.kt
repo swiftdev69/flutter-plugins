@@ -252,7 +252,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                 if(dataSet.dataPoints.size > 0) {
                                     activity.runOnUiThread {
                                         result.success(healthData)
-                                        Thread.interrupted()
+                                        return@runOnUiThread
                                     }
                                 }
                             }
