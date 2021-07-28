@@ -180,7 +180,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         var endTimeFromFlutter = call.argument<Long>("endDate")!!
 
         val diffInMillisec = endTimeFromFlutter - startTimeFromFlutter
-        val diffInDays = TimeUnit.MILLISECONDS.toDays(diffInMillisec) as Int
+        val diffInDays : Int = TimeUnit.MILLISECONDS.toDays(diffInMillisec) as Int
         Log.i("LOG IS THIS+++++++>", "Flutter Change : $startTimeFromFlutter" )
         Log.i("LOG IS THIS+++++++>", "Flutter Change  : $endTimeFromFlutter" )
 
