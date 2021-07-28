@@ -204,13 +204,12 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 val fitnessOptions = FitnessOptions.builder().addDataType(dataType).build()
                 val googleSignInAccount = GoogleSignIn.getAccountForExtension(activity.applicationContext, fitnessOptions)
 
+                ///NEW CODE START
 /*
 
                 val request = DataReadRequest.Builder()
                                 .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                        */
-/*.bucketByTime(1, TimeUnit.DAYS)*//*
-
+                                   .bucketByTime(1, TimeUnit.DAYS)
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
                         .build()
 
@@ -233,12 +232,11 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                 }
                                 Log.i("Helath Data", "Data : ${healthData.toString()}")
 
-                               */
-/* if(dataSet.dataPoints.size > 0) {
+                                if(dataSet.dataPoints.size > 0) {
                                     activity.runOnUiThread {
                                         result.success(healthData)
                                     }
-                                }*//*
+                                }
 
                             }
 
@@ -251,8 +249,9 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
 
 */
+                ///OLD CODE ENDS
 
-                ///OLD CODE
+                ///OLD CODE START
                 val response =Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount).readData(
                         DataReadRequest.Builder()
                                 .read(dataType)
@@ -273,6 +272,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                     )
                 }
                 activity.runOnUiThread { result.success(healthData) }
+                ///OLD CODE ENDS
 
             } catch (e3: Exception) {
                 activity.runOnUiThread { result.success(null) }
