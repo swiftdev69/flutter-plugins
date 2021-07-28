@@ -185,11 +185,11 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter,3)
 */
 
-        val startTemp = Date(startTimeFromFlutter)
-        val endTemp = Date(endTimeFromFlutter)
-
-        val startDays : Int = (startTimeFromFlutter / (1000*60*60*24)).toInt()
-        val endDays : Int = (endTimeFromFlutter / (1000*60*60*24)).toInt()
+//        val startTemp = Date(startTimeFromFlutter)
+//        val endTemp = Date(endTimeFromFlutter)
+//
+//        val startDays : Int = (startTimeFromFlutter / (1000*60*60*24)).toInt()
+//        val endDays : Int = (endTimeFromFlutter / (1000*60*60*24)).toInt()
 
         Log.i("LOG IS THIS+++++++>", "Flutter Change : $startTimeFromFlutter" )
         Log.i("LOG IS THIS+++++++>", "Flutter Change  : $endTimeFromFlutter" )
@@ -205,11 +205,11 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 val googleSignInAccount = GoogleSignIn.getAccountForExtension(activity.applicationContext, fitnessOptions)
 
                 ///NEW CODE START
-/*
+
 
                 val request = DataReadRequest.Builder()
                                 .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                                   .bucketByTime(1, TimeUnit.DAYS)
+                                   .bucketByTime(endTimeFromFlutter - startTimeFromFlutter, TimeUnit.SECONDS)
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
                         .build()
 
@@ -248,30 +248,30 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
 
 
-*/
+
                 ///OLD CODE ENDS
 
                 ///OLD CODE START
-                val response =Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount).readData(
-                        DataReadRequest.Builder()
-                                .read(dataType)
-                                .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
-                                .build()
-                )
-
-                /// Fetch all data points for the specified DataType
-                val dataPoints = Tasks.await<DataReadResponse>(response).getDataSet(dataType)
-
-                /// For each data point, extract the contents and send them to Flutter, along with date and unit.
-                val healthData = dataPoints.dataPoints.mapIndexed { _, dataPoint ->
-                    return@mapIndexed hashMapOf(
-                            "value" to getHealthDataValue(dataPoint, unit),
-                            "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
-                            "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
-                            "unit" to unit.toString()
-                    )
-                }
-                activity.runOnUiThread { result.success(healthData) }
+//                val response =Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount).readData(
+//                        DataReadRequest.Builder()
+//                                .read(dataType)
+//                                .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
+//                                .build()
+//                )
+//
+//                /// Fetch all data points for the specified DataType
+//                val dataPoints = Tasks.await<DataReadResponse>(response).getDataSet(dataType)
+//
+//                /// For each data point, extract the contents and send them to Flutter, along with date and unit.
+//                val healthData = dataPoints.dataPoints.mapIndexed { _, dataPoint ->
+//                    return@mapIndexed hashMapOf(
+//                            "value" to getHealthDataValue(dataPoint, unit),
+//                            "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
+//                            "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
+//                            "unit" to unit.toString()
+//                    )
+//                }
+//                activity.runOnUiThread { result.success(healthData) }
                 ///OLD CODE ENDS
 
             } catch (e3: Exception) {
