@@ -9,6 +9,8 @@ import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.*
 import com.google.android.gms.fitness.request.DataReadRequest
+import com.google.android.gms.fitness.result.DataReadResponse
+import com.google.android.gms.tasks.Tasks
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
@@ -172,27 +174,26 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
     }
 
 
-
     /// Called when the "getHealthDataByType" is invoked from Flutter
     private fun getData(call: MethodCall, result: Result) {
         val type = call.argument<String>("dataTypeKey")!!
         var startTimeFromFlutter = call.argument<Long>("startDate")!!
         var endTimeFromFlutter = call.argument<Long>("endDate")!!
 
-        startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter,3)
-        endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter,3)
+        startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter, 3)
+        endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter, 3)
 
 
         val diffInMillisec = endTimeFromFlutter - startTimeFromFlutter
-        var diffInDays : Int = TimeUnit.MILLISECONDS.toDays(diffInMillisec).toInt()
+        var diffInDays: Int = TimeUnit.MILLISECONDS.toDays(diffInMillisec).toInt()
 
-        if (diffInDays == 0){
+        if (diffInDays == 0) {
             diffInDays = 1
         }
 
-        Log.i("LOG IS THIS+++++++>", "Flutter Change : $startTimeFromFlutter" )
-        Log.i("LOG IS THIS+++++++>", "Flutter Change  : $endTimeFromFlutter" )
-        Log.i("DIFFERENCE BY Yo+++>", "Flutter  Change  : $diffInMillisec : DIFFE IN DAY $diffInDays" )
+        Log.i("LOG IS THIS+++++++>", "Flutter Change : $startTimeFromFlutter")
+        Log.i("LOG IS THIS+++++++>", "Flutter Change  : $endTimeFromFlutter")
+        Log.i("DIFFERENCE BY Yo+++>", "Flutter  Change  : $diffInMillisec : DIFFE IN DAY $diffInDays")
 
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
@@ -217,6 +218,29 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .readData(request)
                         .addOnSuccessListener { response ->
 
+                            val dataList = mutableListOf<Map<String,Any>>()
+
+                            response.buckets.forEach {
+                                it.dataSets.forEach {
+
+                                    it.dataPoints.forEach { dataPoint ->
+                                        val data = hashMapOf(
+                                                "value" to getHealthDataValue(dataPoint, unit),
+                                                "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
+                                                "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
+                                                "unit" to unit.toString()
+                                        )
+
+                                        dataList.add(data)
+                                    }
+                                }
+                            }
+                            result.success(dataList)
+
+                            response.buckets
+                                    .map {
+                                        it.dataSets
+                                    }
                             for (dataSet in response.buckets.flatMap { it.dataSets }) {
                                 Log.i("DATA", "Data returned for Data type: ${dataSet.dataType.name}")
                                 Log.i("DATA", "Data returned for Data type: ${dataSet.dataPoints.size}")
@@ -231,7 +255,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                 }
                                 Log.i("Helath Data", "Data : ${healthData.toString()}")
 
-                                if(dataSet.dataPoints.size > 0) {
+                                if (dataSet.dataPoints.size > 0) {
                                     activity.runOnUiThread {
                                         result.success(healthData)
                                     }
@@ -241,36 +265,35 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                         }
                         .addOnFailureListener { e ->
-                            Log.i("ERROR ","There was an error reading data from Google Fit", e)
+                            Log.i("ERROR ", "There was an error reading data from Google Fit", e)
                         }
-
-
-
 
 
                 ///OLD CODE ENDS
 
                 ///OLD CODE START
-//                val response =Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount).readData(
-//                        DataReadRequest.Builder()
-//                                .read(dataType)
-//                                .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
-//                                .build()
-//                )
-//
-//                /// Fetch all data points for the specified DataType
-//                val dataPoints = Tasks.await<DataReadResponse>(response).getDataSet(dataType)
-//
-//                /// For each data point, extract the contents and send them to Flutter, along with date and unit.
-//                val healthData = dataPoints.dataPoints.mapIndexed { _, dataPoint ->
-//                    return@mapIndexed hashMapOf(
-//                            "value" to getHealthDataValue(dataPoint, unit),
-//                            "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
-//                            "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
-//                            "unit" to unit.toString()
-//                    )
-//                }
-//                activity.runOnUiThread { result.success(healthData) }
+               /* val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount).readData(
+                        DataReadRequest.Builder()
+                                .read(dataType)
+                                .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
+                                .build()
+                )
+
+                /// Fetch all data points for the specified DataType
+                val dataPoints = Tasks.await<DataReadResponse>(response).getDataSet(dataType)
+
+                /// For each data point, extract the contents and send them to Flutter, along with date and unit.
+                val healthData = dataPoints.dataPoints.mapIndexed { _, dataPoint ->
+                    return@mapIndexed hashMapOf(
+                            "value" to getHealthDataValue(dataPoint, unit),
+                            "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
+                            "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
+                            "unit" to unit.toString()
+                    )
+                }
+
+                activity.runOnUiThread { result.success(healthData) }
+*/
                 ///OLD CODE ENDS
 
             } catch (e3: Exception) {
