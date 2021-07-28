@@ -181,9 +181,9 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         var startTimeFromFlutter = call.argument<Long>("startDate")!!
         var endTimeFromFlutter = call.argument<Long>("endDate")!!
 
-        startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter,3)
+       /* startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter,3)
         endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter,3)
-
+*/
 
         val startTemp = Date(startTimeFromFlutter)
         val endTemp = Date(endTimeFromFlutter)
@@ -252,6 +252,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
 */
 
+                ///OLD CODE
                 val response =Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount).readData(
                         DataReadRequest.Builder()
                                 .read(dataType)
