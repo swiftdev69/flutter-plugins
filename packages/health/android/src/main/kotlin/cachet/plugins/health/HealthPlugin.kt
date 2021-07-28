@@ -189,14 +189,8 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         val startDays : Int = (startTimeFromFlutter / (1000*60*60*24)).toInt()
         val endDays : Int = (endTimeFromFlutter / (1000*60*60*24)).toInt()
 
-        var difference : Int = endDays - startDays;
-
-        if(difference == 0){
-           difference = 1;
-        }
         Log.i("LOG IS THIS+++++++>", "Flutter Change : $startTimeFromFlutter" )
         Log.i("LOG IS THIS+++++++>", "Flutter Change  : $endTimeFromFlutter" )
-        Log.i("LOG IS THIS+++++++>", "Difference date  : ${endDays - startDays}" )
 
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
@@ -207,7 +201,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                 val request = DataReadRequest.Builder()
                         .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                        .bucketByTime(difference, TimeUnit.DAYS)
+                        .bucketByTime(endDays - startDays, TimeUnit.DAYS)
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
                         .build()
 
@@ -249,11 +243,11 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                 }
                                 Log.i("Helath Data", "Data : ${healthData.toString()}")
 
-                                if(dataSet.dataPoints.size > 0) {
+                               /* if(dataSet.dataPoints.size > 0) {
                                     activity.runOnUiThread {
                                         result.success(healthData)
                                     }
-                                }
+                                }*/
                             }
 
                         }
