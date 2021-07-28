@@ -9,6 +9,8 @@ import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.*
 import com.google.android.gms.fitness.request.DataReadRequest
+import com.google.android.gms.fitness.result.DataReadResponse
+import com.google.android.gms.tasks.Tasks
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
@@ -199,31 +201,19 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         thread {
             try {
 
-                val request = DataReadRequest.Builder()
-                        .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                        /*.bucketByTime(1, TimeUnit.DAYS)*/
-                        .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
-                        .build()
-
                 val fitnessOptions = FitnessOptions.builder().addDataType(dataType).build()
                 val googleSignInAccount = GoogleSignIn.getAccountForExtension(activity.applicationContext, fitnessOptions)
 
-                /*val  response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
-                        .readData(request);
+/*
 
-                /// Fetch all data points for the specified DataType
-                val dataPoints = Tasks.await<DataReadResponse>(response).getDataSet(dataType)
+                val request = DataReadRequest.Builder()
+                                .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                        */
+/*.bucketByTime(1, TimeUnit.DAYS)*//*
 
-                /// For each data point, extract the contents and send them to Flutter, along with date and unit.
-                val healthData = dataPoints.dataPoints.mapIndexed { _, dataPoint ->
-                    return@mapIndexed hashMapOf(
-                            "value" to getHealthDataValue(dataPoint, unit),
-                            "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
-                            "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
-                            "unit" to unit.toString()
-                    )
-                }
-                activity.runOnUiThread { result.success(healthData) }*/
+                        .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
+                        .build()
+
 
                 Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
                         .readData(request)
@@ -243,11 +233,13 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                 }
                                 Log.i("Helath Data", "Data : ${healthData.toString()}")
 
-                               /* if(dataSet.dataPoints.size > 0) {
+                               */
+/* if(dataSet.dataPoints.size > 0) {
                                     activity.runOnUiThread {
                                         result.success(healthData)
                                     }
-                                }*/
+                                }*//*
+
                             }
 
                         }
@@ -258,15 +250,14 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
 
 
-                /* val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
-                         .readData(
-                                 DataReadRequest.Builder()
-                                .read(dataType)
-                                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                                .build()
-                        )
+*/
 
-                //val pendingResult = Fitness.HistoryApi.readData(response, readRequest)
+                val response =Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount).readData(
+                        DataReadRequest.Builder()
+                                .read(dataType)
+                                .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
+                                .build()
+                )
 
                 /// Fetch all data points for the specified DataType
                 val dataPoints = Tasks.await<DataReadResponse>(response).getDataSet(dataType)
@@ -280,7 +271,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                             "unit" to unit.toString()
                     )
                 }
-                activity.runOnUiThread { result.success(healthData) }*/
+                activity.runOnUiThread { result.success(healthData) }
 
             } catch (e3: Exception) {
                 activity.runOnUiThread { result.success(null) }
