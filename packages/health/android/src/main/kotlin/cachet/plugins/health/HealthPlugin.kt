@@ -9,8 +9,6 @@ import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.*
 import com.google.android.gms.fitness.request.DataReadRequest
-import com.google.android.gms.fitness.result.DataReadResponse
-import com.google.android.gms.tasks.Tasks
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
@@ -181,16 +179,8 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         var startTimeFromFlutter = call.argument<Long>("startDate")!!
         var endTimeFromFlutter = call.argument<Long>("endDate")!!
 
-       /* startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter,3)
-        endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter,3)
-*/
-
-//        val startTemp = Date(startTimeFromFlutter)
-//        val endTemp = Date(endTimeFromFlutter)
-//
-//        val startDays : Int = (startTimeFromFlutter / (1000*60*60*24)).toInt()
-//        val endDays : Int = (endTimeFromFlutter / (1000*60*60*24)).toInt()
-
+        val diffInMillisec = endTimeFromFlutter - startTimeFromFlutter
+        val diffInDays = TimeUnit.MILLISECONDS.toDays(diffInMillisec) as Int
         Log.i("LOG IS THIS+++++++>", "Flutter Change : $startTimeFromFlutter" )
         Log.i("LOG IS THIS+++++++>", "Flutter Change  : $endTimeFromFlutter" )
 
@@ -209,7 +199,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                 val request = DataReadRequest.Builder()
                                 .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                                   .bucketByTime((endTimeFromFlutter - startTimeFromFlutter) as Int, TimeUnit.SECONDS)
+                                   .bucketByTime(diffInDays, TimeUnit.DAYS)
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
                         .build()
 
