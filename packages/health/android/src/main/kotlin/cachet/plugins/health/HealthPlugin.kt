@@ -109,8 +109,8 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
             BODY_FAT_PERCENTAGE -> DataType.TYPE_BODY_FAT_PERCENTAGE
             HEIGHT -> DataType.TYPE_HEIGHT
             WEIGHT -> DataType.TYPE_WEIGHT
-            //STEPS -> DataType.TYPE_STEP_COUNT_DELTA
-            STEPS -> DataType.AGGREGATE_STEP_COUNT_DELTA
+            STEPS -> DataType.TYPE_STEP_COUNT_DELTA
+           /* STEPS -> DataType.AGGREGATE_STEP_COUNT_DELTA*/
             ACTIVE_ENERGY_BURNED -> DataType.TYPE_CALORIES_EXPENDED
             HEART_RATE -> DataType.TYPE_HEART_RATE_BPM
             BODY_TEMPERATURE -> HealthDataTypes.TYPE_BODY_TEMPERATURE
@@ -120,8 +120,8 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
             BLOOD_GLUCOSE -> HealthDataTypes.TYPE_BLOOD_GLUCOSE
             MOVE_MINUTES -> DataType.TYPE_MOVE_MINUTES
             DISTANCE_DELTA -> DataType.TYPE_DISTANCE_DELTA
-            //else -> DataType.TYPE_STEP_COUNT_DELTA
-            else -> DataType.AGGREGATE_STEP_COUNT_DELTA
+            else -> DataType.TYPE_STEP_COUNT_DELTA
+            /*else -> DataType.AGGREGATE_STEP_COUNT_DELTA*/
         }
     }
 
@@ -206,7 +206,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .build()
 
 
-              /*  Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
+                Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
                         .readData(request)
                         .addOnSuccessListener { response ->
 
@@ -233,14 +233,14 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         }
                         .addOnFailureListener { e ->
                             Log.i("ERROR ", "There was an error reading data from Google Fit", e)
-                        }*/
+                        }
 
 
                 ///New CODE ENDS
 
                 ///OLD CODE START
 
-                 val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount).readData(
+                /* val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount).readData(
                          DataReadRequest.Builder()
                                  .read(dataType)
                                  .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
@@ -260,7 +260,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                      )
                  }
 
-                 activity.runOnUiThread { result.success(healthData) }
+                 activity.runOnUiThread { result.success(healthData) }*/
                 ///OLD CODE ENDS
 
             } catch (e3: Exception) {
