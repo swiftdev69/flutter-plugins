@@ -201,7 +201,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .aggregate(datasource, dataType)
                         .bucketByTime(1, TimeUnit.DAYS)
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
-                       // .read(dataType)
+                        .read(dataType)
                         .build()
 
 
