@@ -189,7 +189,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                 val datasource = DataSource.Builder()
                         .setAppPackageName("com.google.android.gms")
-                        .setDataType(dataType)
+                        .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
                         .setType(DataSource.TYPE_DERIVED)
                         .setStreamName("estimated_steps")
                         .build()
