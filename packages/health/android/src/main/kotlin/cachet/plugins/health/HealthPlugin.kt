@@ -173,8 +173,9 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         var startTimeFromFlutter = call.argument<Long>("startDate")!!
         var endTimeFromFlutter = call.argument<Long>("endDate")!!
 
-        startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter, 3)
+      /*  startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter, 3)
         endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter, 3)
+*/
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
         val unit = getUnit(type)
@@ -199,11 +200,8 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 val newRequest =  DataReadRequest.Builder()
                         .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                         .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                        .bucketByActivitySegment(1, TimeUnit.DAYS)
-                        .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
-
-                        /*.bucketByActivitySegment(1, TimeUnit.MILLISECONDS)
-                        .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)*/
+                        .bucketByActivitySegment(1, TimeUnit.MILLISECONDS)
+                        .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
                         .build()
 
                 val datasource = DataSource.Builder()
@@ -236,8 +234,8 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                                         if(dataSet.dataPoints.size > 0){
                                             //total step
-                                            total += dataSet.dataPoints[0].getValue(Field.FIELD_STEPS).asInt();
-
+                                            total += dataSet.dataPoints[0].getValue(Field.FIELD_STEPS).asInt()
+                                            Log.e("STEPS IS", "${dataSet.dataPoints[0].getStartTime(TimeUnit.MILLISECONDS)} And ${dataSet.dataPoints[0].getValue(Field.FIELD_STEPS)} AND ${dataSet.dataPoints[0].getStartTime(TimeUnit.MILLISECONDS)}")
                                         }
                                     }
                                 }
@@ -257,7 +255,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                                                         // total calories burned
                                                         expendedCalories += dp.getValue(field).asFloat()
-                                                        Log.e("CALOURIE IS", "${dp.getValue(field).asFloat()}")
+                                                        Log.e("CALOURIE IS", "${dp.getStartTime(TimeUnit.MILLISECONDS)} And ${dp.getValue(field).asFloat()} AND ${dp.getEndTime(TimeUnit.MILLISECONDS)}")
                                                     }
                                                 }
 
