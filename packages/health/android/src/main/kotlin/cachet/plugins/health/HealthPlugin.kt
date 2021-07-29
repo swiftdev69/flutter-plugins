@@ -172,9 +172,9 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         var startTimeFromFlutter = call.argument<Long>("startDate")!!
         var endTimeFromFlutter = call.argument<Long>("endDate")!!
 
-        startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter, 3)
+      /*  startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter, 3)
         endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter, 3)
-
+*/
 
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
@@ -198,13 +198,13 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 ///NEW CODE START
                 val request = DataReadRequest.Builder()
                         .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                        .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
+                       /* .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)*/
                         .bucketByTime(1, TimeUnit.DAYS)
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
                         .build()
 
 
-                Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
+              /*  Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
                         .readData(request)
                         .addOnSuccessListener { response ->
 
@@ -231,13 +231,14 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         }
                         .addOnFailureListener { e ->
                             Log.i("ERROR ", "There was an error reading data from Google Fit", e)
-                        }
+                        }*/
 
 
-                ///OLD CODE ENDS
+                ///New CODE ENDS
 
                 ///OLD CODE START
-                /* val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount).readData(
+
+                 val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount).readData(
                          DataReadRequest.Builder()
                                  .read(dataType)
                                  .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
@@ -258,7 +259,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                  }
 
                  activity.runOnUiThread { result.success(healthData) }
- */
                 ///OLD CODE ENDS
 
             } catch (e3: Exception) {
