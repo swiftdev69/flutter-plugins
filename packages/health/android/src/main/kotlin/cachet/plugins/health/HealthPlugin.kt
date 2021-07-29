@@ -184,20 +184,10 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter, 3)
 
 
-        val diffInMillisec = endTimeFromFlutter - startTimeFromFlutter
-        var diffInDays: Int = TimeUnit.MILLISECONDS.toDays(diffInMillisec).toInt()
-
-        if (diffInDays == 0) {
-            diffInDays = 1
-        }
-
-        Log.i("LOG IS THIS+++++++>", "Flutter Change : $startTimeFromFlutter")
-        Log.i("LOG IS THIS+++++++>", "Flutter Change  : $endTimeFromFlutter")
-        Log.i("DIFFERENCE BY Yo+++>", "Flutter  Change  : $diffInMillisec : DIFFE IN DAY $diffInDays")
-
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
         val unit = getUnit(type)
+
         /// Start a new thread for doing a GoogleFit data lookup
         thread {
             try {
@@ -206,11 +196,11 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 val googleSignInAccount = GoogleSignIn.getAccountForExtension(activity.applicationContext, fitnessOptions)
 
                 ///NEW CODE START
-
                 val request = DataReadRequest.Builder()
                         .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
                         .bucketByTime(1, TimeUnit.DAYS)
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
+                        .read(dataType)
                         .build()
 
 
@@ -222,7 +212,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                             response.buckets.forEach {
                                 it.dataSets.forEach {
-
                                     it.dataPoints.forEach { dataPoint ->
                                         val data = hashMapOf(
                                                 "value" to getHealthDataValue(dataPoint, unit),
@@ -236,29 +225,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                 }
                             }
                             result.success(dataList)
-
-/*                            for (dataSet in response.buckets.flatMap { it.dataSets }) {
-                                Log.i("DATA", "Data returned for Data type: ${dataSet.dataType.name}")
-                                Log.i("DATA", "Data returned for Data type: ${dataSet.dataPoints.size}")
-
-                                val healthData = dataSet.dataPoints.mapIndexed { _, dataPoint ->
-                                    return@mapIndexed hashMapOf(
-                                            "value" to getHealthDataValue(dataPoint, unit),
-                                            "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
-                                            "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
-                                            "unit" to unit.toString()
-                                    )
-                                }
-                                Log.i("Helath Data", "Data : ${healthData.toString()}")
-
-                                if (dataSet.dataPoints.size > 0) {
-                                    activity.runOnUiThread {
-                                        result.success(healthData)
-                                    }
-                                }
-
-                            }*/
-
                         }
                         .addOnFailureListener { e ->
                             Log.i("ERROR ", "There was an error reading data from Google Fit", e)
