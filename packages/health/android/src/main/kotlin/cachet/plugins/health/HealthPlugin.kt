@@ -43,15 +43,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
     private var MOVE_MINUTES = "MOVE_MINUTES"
     private var DISTANCE_DELTA = "DISTANCE_DELTA"
 
-    val datasource = DataSource.Builder()
-            .setAppPackageName("com.google.android.gms")
-            .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
-            .setType(DataSource.TYPE_DERIVED)
-            .setStreamName("estimated_steps")
-            .build()
-
-    private val runningQOrLater = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
-
     companion object {
         @JvmStatic
         fun registerWith(registrar: Registrar) {
@@ -196,11 +187,17 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 val fitnessOptions = FitnessOptions.builder().addDataType(dataType).build()
                 val googleSignInAccount = GoogleSignIn.getAccountForExtension(activity.applicationContext, fitnessOptions)
 
+                val datasource = DataSource.Builder()
+                        .setAppPackageName("com.google.android.gms")
+                        .setDataType(dataType)
+                        .setType(DataSource.TYPE_DERIVED)
+                        .setStreamName("estimated_steps")
+                        .build()
+
+
                 ///NEW CODE START
                 val request = DataReadRequest.Builder()
-                        /*.aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                        .aggregate(datasource,DataType.AGGREGATE_CALORIES_EXPENDED)*/
-                        .aggregate(DataType.AGGREGATE_STEP_COUNT_DELTA,DataType.AGGREGATE_CALORIES_EXPENDED)
+                        .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
                         .bucketByTime(1, TimeUnit.DAYS)
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
                         .build()
@@ -213,6 +210,9 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                             val dataList = mutableListOf<Map<String,Any>>()
 
                             response.buckets.forEach {
+
+                                val ab = it.getDataSet(dataType)
+
                                 it.dataSets.forEach {
                                     it.dataPoints.forEach { dataPoint ->
                                         val data = hashMapOf(
