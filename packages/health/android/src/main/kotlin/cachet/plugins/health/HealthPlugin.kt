@@ -221,7 +221,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     dataList.add(data)
                                 }
                             }
-                            result.success(dataList)
 
 
                             /*it.dataSets.forEach {
