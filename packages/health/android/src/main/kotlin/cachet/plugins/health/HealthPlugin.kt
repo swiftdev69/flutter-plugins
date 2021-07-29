@@ -173,9 +173,9 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         var startTimeFromFlutter = call.argument<Long>("startDate")!!
         var endTimeFromFlutter = call.argument<Long>("endDate")!!
 
-        startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter, 3)
+      /*  startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter, 3)
         endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter, 3)
-
+*/
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
         val unit = getUnit(type)
@@ -190,14 +190,26 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 val fitnessOptions = FitnessOptions.builder().addDataType(dataType).build()
                 val googleSignInAccount = GoogleSignIn.getAccountForExtension(activity.applicationContext, fitnessOptions)
 
+                val ESTIMATED_STEP_DELTAS: DataSource = DataSource.Builder()
+                        .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
+                        .setType(DataSource.TYPE_DERIVED)
+                        .setStreamName("estimated_steps")
+                        .setAppPackageName("com.google.android.gms")
+                        .build()
+
+                val newRequest =  DataReadRequest.Builder()
+                        .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
+                        .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                        .bucketByActivitySegment(1, TimeUnit.MILLISECONDS)
+                        .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
+                        .build()
+
                 val datasource = DataSource.Builder()
                         .setAppPackageName("com.google.android.gms")
                         .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
                         .setType(DataSource.TYPE_DERIVED)
                         .setStreamName("estimated_steps")
                         .build()
-
-
 
                 ///NEW CODE START
                 val request = DataReadRequest.Builder()
@@ -210,7 +222,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
 
                 Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
-                        .readData(request)
+                        .readData(newRequest)
                         .addOnSuccessListener { response ->
 
                             response.buckets.forEach {
