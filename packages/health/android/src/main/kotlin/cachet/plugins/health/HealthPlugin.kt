@@ -174,9 +174,8 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         var startTimeFromFlutter = call.argument<Long>("startDate")!!
         var endTimeFromFlutter = call.argument<Long>("endDate")!!
 
-      /*  startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter, 3)
+        startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter, 3)
         endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter, 3)
-*/
 
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
