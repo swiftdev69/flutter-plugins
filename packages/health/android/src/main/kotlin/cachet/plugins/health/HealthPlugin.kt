@@ -6,11 +6,10 @@ import android.os.Handler
 import android.util.Log
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.fitness.Fitness
+import com.google.android.gms.fitness.FitnessActivities
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.*
 import com.google.android.gms.fitness.request.DataReadRequest
-import com.google.android.gms.fitness.result.DataReadResponse
-import com.google.android.gms.tasks.Tasks
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
@@ -181,6 +180,9 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         val dataType = keyToHealthDataType(type)
         val unit = getUnit(type)
 
+        var total = 0
+        var expendedCalories = 0f
+
         /// Start a new thread for doing a GoogleFit data lookup
         thread {
             try {
@@ -191,30 +193,72 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 val datasource = DataSource.Builder()
                         .setAppPackageName("com.google.android.gms")
                         .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
-                        .setDataType(DataType.TYPE_CALORIES_EXPENDED)
                         .setType(DataSource.TYPE_DERIVED)
                         .setStreamName("estimated_steps")
                         .build()
 
 
+
                 ///NEW CODE START
                 val request = DataReadRequest.Builder()
                         .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                        .aggregate(datasource, DataType.AGGREGATE_CALORIES_EXPENDED)
+                        .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                         .bucketByTime(1, TimeUnit.DAYS)
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
                         .build()
+
 
 
                 Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
                         .readData(request)
                         .addOnSuccessListener { response ->
 
-                            val dataList = mutableListOf<Map<String, Any>>()
+                            response.buckets.forEach {
 
+                                val dataSetx: List<DataSet> = it.dataSets
+
+                                dataSetx.forEach {dataSet->
+                                    if(dataSet.dataType.name == "com.google.step_count.delta"){
+
+                                        if(dataSet.dataPoints.size > 0){
+                                            //total step
+                                            total += dataSet.dataPoints[0].getValue(Field.FIELD_STEPS).asInt();
+
+                                        }
+                                    }
+                                }
+
+                                val bucketActivity = it.activity
+
+                                if(bucketActivity.contains(FitnessActivities.WALKING) || bucketActivity.contains(FitnessActivities.RUNNING)){
+                                    val dataSets: List<DataSet> = it.dataSets
+
+                                    dataSets.forEach {dataSet->
+                                        if(dataSet.dataType.name == "com.google.calories.expended") {
+
+                                            dataSet.dataPoints.forEach {dp->
+
+                                                if (dp.getEndTime(TimeUnit.MILLISECONDS) > dp.getStartTime(TimeUnit.MILLISECONDS)) {
+                                                    for (field in dp.dataType.fields) {
+
+                                                        // total calories burned
+                                                        expendedCalories += dp.getValue(field).asFloat()
+                                                    }
+                                                }
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+
+
+                            val dataList = mutableListOf<Map<String, Any>>()
                             response.buckets.forEach {
 
                                 it.dataSets.forEach {
+
                                     it.dataPoints.forEach { dataPoint ->
                                         val data = hashMapOf(
                                                 "value" to getHealthDataValue(dataPoint, unit),
@@ -229,6 +273,9 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                 }
                             }
 
+
+                            Log.e("GoogleFit", "Steps total is $total");
+                            Log.e("GoogleFit", "Total cal is $expendedCalories");
                             result.success(dataList)
                         }
                         .addOnFailureListener { e ->
@@ -242,6 +289,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                 /* val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount).readData(
                          DataReadRequest.Builder()
+
                                  .read(dataType)
                                  .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
                                  .build()
