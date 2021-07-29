@@ -109,7 +109,8 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
             BODY_FAT_PERCENTAGE -> DataType.TYPE_BODY_FAT_PERCENTAGE
             HEIGHT -> DataType.TYPE_HEIGHT
             WEIGHT -> DataType.TYPE_WEIGHT
-            STEPS -> DataType.TYPE_STEP_COUNT_DELTA
+            //STEPS -> DataType.TYPE_STEP_COUNT_DELTA
+            STEPS -> DataType.AGGREGATE_STEP_COUNT_DELTA
             ACTIVE_ENERGY_BURNED -> DataType.TYPE_CALORIES_EXPENDED
             HEART_RATE -> DataType.TYPE_HEART_RATE_BPM
             BODY_TEMPERATURE -> HealthDataTypes.TYPE_BODY_TEMPERATURE
@@ -119,7 +120,8 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
             BLOOD_GLUCOSE -> HealthDataTypes.TYPE_BLOOD_GLUCOSE
             MOVE_MINUTES -> DataType.TYPE_MOVE_MINUTES
             DISTANCE_DELTA -> DataType.TYPE_DISTANCE_DELTA
-            else -> DataType.TYPE_STEP_COUNT_DELTA
+            //else -> DataType.TYPE_STEP_COUNT_DELTA
+            else -> DataType.AGGREGATE_STEP_COUNT_DELTA
         }
     }
 
