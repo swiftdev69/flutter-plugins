@@ -191,6 +191,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 val datasource = DataSource.Builder()
                         .setAppPackageName("com.google.android.gms")
                         .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
+                        .setDataType(DataType.TYPE_CALORIES_EXPENDED)
                         .setType(DataSource.TYPE_DERIVED)
                         .setStreamName("estimated_steps")
                         .build()
@@ -199,7 +200,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 ///NEW CODE START
                 val request = DataReadRequest.Builder()
                         .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                        .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
+                        .aggregate(datasource, DataType.AGGREGATE_CALORIES_EXPENDED)
                         .bucketByTime(1, TimeUnit.DAYS)
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
                         .build()
