@@ -199,7 +199,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                 val newRequest =  DataReadRequest.Builder()
                         .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                         .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                        .bucketByTime(1, TimeUnit.DAYS)
+                        .bucketByActivitySegment(1, TimeUnit.DAYS)
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
 
                         /*.bucketByActivitySegment(1, TimeUnit.MILLISECONDS)
