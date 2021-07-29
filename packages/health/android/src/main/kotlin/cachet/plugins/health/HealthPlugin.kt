@@ -255,6 +255,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                                                         // total calories burned
                                                         expendedCalories += dp.getValue(field).asFloat()
+                                                        Log.e("CALOURIE IS", "${dp.getValue(field).asFloat()}")
                                                     }
                                                 }
 
@@ -278,8 +279,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                                 "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
                                                 "unit" to unit.toString()
                                         )
-
-                                        Log.e("TEMP DATA","${data.toString()}")
                                         dataList.add(data)
                                     }
                                 }
