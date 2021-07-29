@@ -145,7 +145,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
     /// Extracts the (numeric) value from a Health Data Point
     private fun getHealthDataValue(dataPoint: DataPoint, unit: Field): Any {
 
-        Log.e("TEMP DATA","${dataPoint.dataType} ======> ${dataPoint.getValue(unit)}")
+       // Log.e("TEMP DATA","${dataPoint.dataType} ======> ${dataPoint.getValue(unit)}")
         return try {
             dataPoint.getValue(unit).asFloat()
         } catch (e1: Exception) {
@@ -211,21 +211,34 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                             response.buckets.forEach {
 
-                                val ab = it.getDataSet(dataType)
-
-                                it.dataSets.forEach {
-                                    it.dataPoints.forEach { dataPoint ->
-                                        val data = hashMapOf(
-                                                "value" to getHealthDataValue(dataPoint, unit),
-                                                "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
-                                                "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
-                                                "unit" to unit.toString()
-                                        )
-
-                                        dataList.add(data)
-                                    }
+                                it.getDataSet(dataType)?.dataPoints?.forEach {dataPoint->
+                                    val data = hashMapOf(
+                                            "value" to getHealthDataValue(dataPoint, unit),
+                                            "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
+                                            "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
+                                            "unit" to unit.toString()
+                                    )
+                                    dataList.add(data)
                                 }
                             }
+                            result.success(dataList)
+
+
+                            /*it.dataSets.forEach {
+                                it.dataPoints.forEach { dataPoint ->
+                                    val data = hashMapOf(
+                                            "value" to getHealthDataValue(dataPoint, unit),
+                                            "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
+                                            "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
+                                            "unit" to unit.toString()
+                                    )
+
+                                    dataList.add(data)
+                                }
+                            }
+                            }
+                            */
+
                             result.success(dataList)
                         }
                         .addOnFailureListener { e ->
