@@ -129,6 +129,8 @@ class HealthFactory {
           DateTime to = DateTime.fromMillisecondsSinceEpoch(e["date_to"]);
           String typeString= e["type"];
 
+          print(typeString);
+
           var androidType = HealthDataType.values.firstWhere((element) => element.toString() == typeString);
           var androidDataTypeToUnit = _dataTypeToUnit[androidType];
 
