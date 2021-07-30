@@ -199,13 +199,24 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .build()
 
                 val newRequest = DataReadRequest.Builder()
-                        .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                         .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                        .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
+                        .aggregate(DataType.TYPE_DISTANCE_DELTA,DataType.AGGREGATE_DISTANCE_DELTA)
                         .bucketByActivitySegment(1, TimeUnit.MILLISECONDS)
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
                         .build()
 
                 ///NEW CODE START
+
+                /* val request = DataReadRequest.Builder()
+                         .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                         .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
+                         .bucketByTime(1, TimeUnit.DAYS)
+                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
+                         .build()*/
+
+
+
                 Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
                         .readData(newRequest)
                         .addOnSuccessListener { response ->
@@ -266,8 +277,11 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                                 "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
                                                 "unit" to unit.toString()
                                         )
+
+                                        Log.e("TEMP DATA ",data.toString())
                                         dataList.add(data)
                                     }
+
                                 }
                             }
 
@@ -280,16 +294,14 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     "value" to total,
                                     "date_from" to startTimeFromFlutter,
                                     "date_to" to endTimeFromFlutter,
-                                    "unit" to Field.FIELD_STEPS.toString(),
-                                    "type" to "STEPS"
+                                    "unit" to Field.FIELD_STEPS.toString()
                             )
                             newDataList.add(data)
                             val calouriData = hashMapOf(
                                     "value" to expendedCalories,
                                     "date_from" to startTimeFromFlutter,
                                     "date_to" to endTimeFromFlutter,
-                                    "unit" to Field.FIELD_CALORIES.toString(),
-                                    "type" to "ACTIVE_ENERGY_BURNED"
+                                    "unit" to Field.FIELD_CALORIES.toString()
 
                             )
                             newDataList.add(calouriData)
