@@ -270,13 +270,13 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
 
 
-                                            if (dp.getEndTime(TimeUnit.MILLISECONDS) > dp.getStartTime(TimeUnit.MILLISECONDS)) {
+
                                                 for (field in dp.dataType.fields) {
 
                                                     Log.e("DISTANCE ", "${dp.getValue(field)}")
 
                                                 }
-                                            }
+
 
                                         }
                                     }
