@@ -275,9 +275,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                                                     Log.e("DISTANCE ", "${dp.getValue(field)}")
 
-                                                    // total calories burned
-                                                    expendedCalories += dp.getValue(field).asFloat()
-                                                    Log.e("CALOURIE IS", "${dp.getStartTime(TimeUnit.MILLISECONDS)} And ${dp.getValue(field).asFloat()} AND ${dp.getEndTime(TimeUnit.MILLISECONDS)}")
                                                 }
                                             }
 
