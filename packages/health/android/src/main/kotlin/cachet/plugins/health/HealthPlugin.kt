@@ -267,27 +267,16 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                 dataSetsdistance.forEach { dataSet ->
                                     if (dataSet.dataType.name == "com.google.distance.delta") {
 
-                                        if (dataSet.dataPoints.size > 0) {
-
-                                            //total step
-                                            distance += dataSet.dataPoints[2].getValue(Field.FIELD_DISTANCE).asFloat()
-
-                                            Log.e("DISTANCE INSIDE ", "${dataSet.dataPoints[2].getValue(Field.FIELD_DISTANCE).asFloat()}")
-
-                                        }
-
-                                        /*dataSet.dataPoints.forEach { dp ->
+                                        dataSet.dataPoints.forEach { dp ->
 
                                                 for (field in dp.dataType.fields) {
-
-                                                    distance += dataSet.dataPoints[2].getValue(Field.FIELD_STEPS).asInt()
-
+                                                    distance += dp.getValue(Field.FIELD_STEPS).asInt()
                                                     Log.e("DISTANCE ", "${dp.getValue(field)}")
 
                                                 }
 
 
-                                        }*/
+                                        }
                                     }
                                 }
 
