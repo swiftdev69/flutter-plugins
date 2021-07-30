@@ -270,7 +270,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                         dataSet.dataPoints.forEach { dp ->
 
                                                 for (field in dp.dataType.fields) {
-                                                    distance += dp.getValue(Field.FIELD_STEPS).asInt()
+                                                    distance += dp.getValue(field).asInt()
                                                     Log.e("DISTANCE ", "${dp.getValue(field)}")
 
                                                 }
