@@ -239,14 +239,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     }
                                 }
 
-                                val data = hashMapOf(
-                                        "value" to total,
-                                        "date_from" to startTimeFromFlutter,
-                                        "date_to" to endTimeFromFlutter,
-                                        "unit" to unit.toString()
-                                )
-
-                                newDataList.add(data)
 
                                 val dataSets: List<DataSet> = it.dataSets
 
@@ -267,14 +259,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     }
                                 }
 
-                                val calouriData = hashMapOf(
-                                        "value" to expendedCalories,
-                                        "date_from" to startTimeFromFlutter,
-                                        "date_to" to endTimeFromFlutter,
-                                        "unit" to unit.toString()
-                                )
 
-                                newDataList.add(calouriData)
 
                             }
 
@@ -300,6 +285,21 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                             Log.e("GoogleFit", "Steps total is $total")
                             Log.e("GoogleFit", "Total cal is $expendedCalories")
 
+
+                            val data = hashMapOf(
+                                    "value" to total,
+                                    "date_from" to startTimeFromFlutter,
+                                    "date_to" to endTimeFromFlutter,
+                                    "unit" to unit.toString()
+                            )
+                            newDataList.add(data)
+                            val calouriData = hashMapOf(
+                                    "value" to expendedCalories,
+                                    "date_from" to startTimeFromFlutter,
+                                    "date_to" to endTimeFromFlutter,
+                                    "unit" to unit.toString()
+                            )
+                            newDataList.add(calouriData)
 
                             result.success(newDataList)
                         }
