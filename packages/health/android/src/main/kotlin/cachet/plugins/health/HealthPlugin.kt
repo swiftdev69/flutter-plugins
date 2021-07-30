@@ -268,7 +268,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                 }
 
                                 val calouriData = hashMapOf(
-                                        "value" to total,
+                                        "value" to expendedCalories,
                                         "date_from" to startTimeFromFlutter,
                                         "date_to" to endTimeFromFlutter,
                                         "unit" to unit.toString()
