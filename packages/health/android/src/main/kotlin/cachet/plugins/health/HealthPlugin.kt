@@ -183,6 +183,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
         var total = 0
         var expendedCalories = 0f
+        var distance = 0f
 
         /// Start a new thread for doing a GoogleFit data lookup
         thread {
@@ -266,19 +267,27 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                 dataSetsdistance.forEach { dataSet ->
                                     if (dataSet.dataType.name == "com.google.distance.delta") {
 
-                                        dataSet.dataPoints.forEach { dp ->
+                                        if (dataSet.dataPoints.size > 0) {
 
+                                            //total step
+                                            distance += dataSet.dataPoints[2].getValue(Field.FIELD_DISTANCE).asFloat()
 
+                                            Log.e("DISTANCE INSIDE ", "${dataSet.dataPoints[2].getValue(Field.FIELD_DISTANCE).asFloat()}")
 
+                                        }
+
+                                        /*dataSet.dataPoints.forEach { dp ->
 
                                                 for (field in dp.dataType.fields) {
+
+                                                    distance += dataSet.dataPoints[2].getValue(Field.FIELD_STEPS).asInt()
 
                                                     Log.e("DISTANCE ", "${dp.getValue(field)}")
 
                                                 }
 
 
-                                        }
+                                        }*/
                                     }
                                 }
 
@@ -310,6 +319,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                             Log.e("GoogleFit", "Steps total is $total")
                             Log.e("GoogleFit", "Total cal is $expendedCalories")
+                            Log.e("GoogleFit", "Total distance is $distance")
 
 
                             val data = hashMapOf(
