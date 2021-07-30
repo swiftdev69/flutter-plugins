@@ -290,14 +290,14 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     "value" to total,
                                     "date_from" to startTimeFromFlutter,
                                     "date_to" to endTimeFromFlutter,
-                                    "unit" to unit.toString()
+                                    "unit" to Field.FIELD_STEPS.toString()
                             )
                             newDataList.add(data)
                             val calouriData = hashMapOf(
                                     "value" to expendedCalories,
                                     "date_from" to startTimeFromFlutter,
                                     "date_to" to endTimeFromFlutter,
-                                    "unit" to unit.toString()
+                                    "unit" to Field.FIELD_CALORIES.toString()
                             )
                             newDataList.add(calouriData)
 
