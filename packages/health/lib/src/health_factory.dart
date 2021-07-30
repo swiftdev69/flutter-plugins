@@ -127,22 +127,8 @@ class HealthFactory {
           num value = e["value"];
           DateTime from = DateTime.fromMillisecondsSinceEpoch(e["date_from"]);
           DateTime to = DateTime.fromMillisecondsSinceEpoch(e["date_to"]);
-          String typeString= e["type"];
-
-          print(typeString);
-
-          var androidType = HealthDataType.values.firstWhere((element) => element.toString() == typeString);
-          var androidDataTypeToUnit = _dataTypeToUnit[androidType];
-
-          print(androidType.toString());
-          print(androidDataTypeToUnit.toString());
-
-          if(Platform.isAndroid){
-            return HealthDataPoint._(value, androidType, androidDataTypeToUnit, from, to, _platformType, _deviceId);
-          }else if(Platform.isIOS){
-            return HealthDataPoint._(
-                value, dataType, unit, from, to, _platformType, _deviceId);
-          }
+          return HealthDataPoint._(
+              value, dataType, unit, from, to, _platformType, _deviceId);
 
         }).toList();
       }
