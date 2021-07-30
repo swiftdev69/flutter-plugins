@@ -10,8 +10,6 @@ import com.google.android.gms.fitness.FitnessActivities
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.*
 import com.google.android.gms.fitness.request.DataReadRequest
-import com.google.android.gms.fitness.result.DataReadResponse
-import com.google.android.gms.tasks.Tasks
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
@@ -208,9 +206,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .build()
 
                 ///NEW CODE START
-
-
-              /*  Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
+                Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
                         .readData(newRequest)
                         .addOnSuccessListener { response ->
 
@@ -302,15 +298,20 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         }
                         .addOnFailureListener { e ->
                             Log.i("ERROR ", "There was an error reading data from Google Fit", e)
-                        }*/
+                        }
 
 
                 ///New CODE ENDS
 
                 ///OLD CODE START
 
-                 val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
-                         .readData(newRequest)
+                /* val response = Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount).readData(
+                         DataReadRequest.Builder()
+
+                                 .read(dataType)
+                                 .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
+                                 .build()
+                 )
 
                  /// Fetch all data points for the specified DataType
                  val dataPoints = Tasks.await<DataReadResponse>(response).getDataSet(dataType)
@@ -325,7 +326,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                      )
                  }
 
-                 activity.runOnUiThread { result.success(healthData) }
+                 activity.runOnUiThread { result.success(healthData) }*/
                 ///OLD CODE ENDS
 
             } catch (e3: Exception) {
