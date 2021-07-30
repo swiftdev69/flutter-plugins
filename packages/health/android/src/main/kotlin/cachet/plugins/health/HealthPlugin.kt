@@ -109,7 +109,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
             HEIGHT -> DataType.TYPE_HEIGHT
             WEIGHT -> DataType.TYPE_WEIGHT
             STEPS -> DataType.TYPE_STEP_COUNT_DELTA
-           /* STEPS -> DataType.AGGREGATE_STEP_COUNT_DELTA*/
+            /* STEPS -> DataType.AGGREGATE_STEP_COUNT_DELTA*/
             ACTIVE_ENERGY_BURNED -> DataType.TYPE_CALORIES_EXPENDED
             HEART_RATE -> DataType.TYPE_HEART_RATE_BPM
             BODY_TEMPERATURE -> HealthDataTypes.TYPE_BODY_TEMPERATURE
@@ -173,31 +173,10 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         var startTimeFromFlutter = call.argument<Long>("startDate")!!
         var endTimeFromFlutter = call.argument<Long>("endDate")!!
 
-      /*  startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter, 3)
-        endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter, 3)
-*/
+        /*  startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter, 3)
+          endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter, 3)
+  */
 
-
-       /* val calendar = Calendar.getInstance()
-        val startCalendar = Calendar.getInstance(Locale.getDefault())
-
-
-        startCalendar[Calendar.YEAR] = calendar.get(Calendar.YEAR)
-        startCalendar[Calendar.MONTH] = calendar.get(Calendar.MONTH)
-        startCalendar[Calendar.DAY_OF_MONTH] = calendar.get(Calendar.DAY_OF_MONTH)
-
-        startCalendar[Calendar.HOUR_OF_DAY] = 23
-        startCalendar[Calendar.MINUTE] = 59
-        startCalendar[Calendar.SECOND] = 59
-        startCalendar[Calendar.MILLISECOND] = 999
-        val endTime = startCalendar.timeInMillis
-
-
-        startCalendar[Calendar.HOUR_OF_DAY] = 0
-        startCalendar[Calendar.MINUTE] = 0
-        startCalendar[Calendar.SECOND] = 0
-        startCalendar[Calendar.MILLISECOND] = 0
-        val startTime = startCalendar.timeInMillis*/
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
         val unit = getUnit(type)
@@ -219,27 +198,21 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .setAppPackageName("com.google.android.gms")
                         .build()
 
-                val newRequest =  DataReadRequest.Builder()
+                val newRequest = DataReadRequest.Builder()
                         .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                         .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
                         .bucketByActivitySegment(1, TimeUnit.MILLISECONDS)
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
                         .build()
 
-                val datasource = DataSource.Builder()
-                        .setAppPackageName("com.google.android.gms")
-                        .setDataType(DataType.TYPE_STEP_COUNT_DELTA)
-                        .setType(DataSource.TYPE_DERIVED)
-                        .setStreamName("estimated_steps")
-                        .build()
-
                 ///NEW CODE START
-                val request = DataReadRequest.Builder()
-                        .aggregate(datasource, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                        .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
-                        .bucketByTime(1, TimeUnit.DAYS)
-                        .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
-                        .build()
+
+                /* val request = DataReadRequest.Builder()
+                         .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                         .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
+                         .bucketByTime(1, TimeUnit.DAYS)
+                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
+                         .build()*/
 
 
 
@@ -247,46 +220,60 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .readData(newRequest)
                         .addOnSuccessListener { response ->
 
+                            val newDataList = mutableListOf<Map<String, Any>>()
+
                             response.buckets.forEach {
 
                                 val dataSetx: List<DataSet> = it.dataSets
 
-                                dataSetx.forEach {dataSet->
-                                    if(dataSet.dataType.name == "com.google.step_count.delta"){
+                                dataSetx.forEach { dataSet ->
+                                    if (dataSet.dataType.name == "com.google.step_count.delta") {
 
-                                        if(dataSet.dataPoints.size > 0){
+                                        if (dataSet.dataPoints.size > 0) {
+
+                                            val data = hashMapOf(
+                                                    "value" to getHealthDataValue(dataSet.dataPoints[0], unit),
+                                                    "date_from" to dataSet.dataPoints[0].getStartTime(TimeUnit.MILLISECONDS),
+                                                    "date_to" to dataSet.dataPoints[0].getEndTime(TimeUnit.MILLISECONDS),
+                                                    "unit" to unit.toString()
+                                            )
+                                            newDataList.add(data)
+
                                             //total step
                                             total += dataSet.dataPoints[0].getValue(Field.FIELD_STEPS).asInt()
+
                                             Log.e("STEPS IS", "${dataSet.dataPoints[0].getStartTime(TimeUnit.MILLISECONDS)} And ${dataSet.dataPoints[0].getValue(Field.FIELD_STEPS)} AND ${dataSet.dataPoints[0].getStartTime(TimeUnit.MILLISECONDS)}")
                                         }
                                     }
                                 }
+                                val dataSets: List<DataSet> = it.dataSets
 
-                                val bucketActivity = it.activity
+                                dataSets.forEach { dataSet ->
+                                    if (dataSet.dataType.name == "com.google.calories.expended") {
 
+                                        dataSet.dataPoints.forEach { dp ->
 
-                                    val dataSets: List<DataSet> = it.dataSets
+                                            if (dp.getEndTime(TimeUnit.MILLISECONDS) > dp.getStartTime(TimeUnit.MILLISECONDS)) {
+                                                for (field in dp.dataType.fields) {
 
-                                    dataSets.forEach {dataSet->
-                                        if(dataSet.dataType.name == "com.google.calories.expended") {
-
-                                            dataSet.dataPoints.forEach {dp->
-
-                                                if (dp.getEndTime(TimeUnit.MILLISECONDS) > dp.getStartTime(TimeUnit.MILLISECONDS)) {
-                                                    for (field in dp.dataType.fields) {
-
-                                                        // total calories burned
-                                                        expendedCalories += dp.getValue(field).asFloat()
-                                                        Log.e("CALOURIE IS", "${dp.getStartTime(TimeUnit.MILLISECONDS)} And ${dp.getValue(field).asFloat()} AND ${dp.getEndTime(TimeUnit.MILLISECONDS)}")
-                                                    }
+                                                    val data = hashMapOf(
+                                                            "value" to getHealthDataValue(dp, unit),
+                                                            "date_from" to dp.getStartTime(TimeUnit.MILLISECONDS),
+                                                            "date_to" to dp.getEndTime(TimeUnit.MILLISECONDS),
+                                                            "unit" to unit.toString()
+                                                    )
+                                                    newDataList.add(data)
+                                                    // total calories burned
+                                                    expendedCalories += dp.getValue(field).asFloat()
+                                                    Log.e("CALOURIE IS", "${dp.getStartTime(TimeUnit.MILLISECONDS)} And ${dp.getValue(field).asFloat()} AND ${dp.getEndTime(TimeUnit.MILLISECONDS)}")
                                                 }
-
                                             }
+
                                         }
                                     }
+                                }
 
                             }
-
 
 
                             val dataList = mutableListOf<Map<String, Any>>()
@@ -307,9 +294,11 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                             }
 
 
-                            Log.e("GoogleFit", "Steps total is $total");
-                            Log.e("GoogleFit", "Total cal is $expendedCalories");
-                            result.success(dataList)
+                            Log.e("GoogleFit", "Steps total is $total")
+                            Log.e("GoogleFit", "Total cal is $expendedCalories")
+
+
+                            result.success(newDataList)
                         }
                         .addOnFailureListener { e ->
                             Log.i("ERROR ", "There was an error reading data from Google Fit", e)
