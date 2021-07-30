@@ -264,7 +264,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                                 val bucketActivity = it.activity
 
-                                if(bucketActivity.contains(FitnessActivities.WALKING) || bucketActivity.contains(FitnessActivities.RUNNING)){
+
                                     val dataSets: List<DataSet> = it.dataSets
 
                                     dataSets.forEach {dataSet->
@@ -284,7 +284,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                             }
                                         }
                                     }
-                                }
+
                             }
 
 
