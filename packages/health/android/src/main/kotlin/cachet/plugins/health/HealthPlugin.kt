@@ -176,6 +176,28 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
       /*  startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter, 3)
         endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter, 3)
 */
+
+
+        val calendar = Calendar.getInstance()
+        val startCalendar = Calendar.getInstance(Locale.getDefault())
+
+
+        startCalendar[Calendar.YEAR] = calendar.get(Calendar.YEAR)
+        startCalendar[Calendar.MONTH] = calendar.get(Calendar.MONTH)
+        startCalendar[Calendar.DAY_OF_MONTH] = calendar.get(Calendar.DAY_OF_MONTH)
+
+        startCalendar[Calendar.HOUR_OF_DAY] = 23
+        startCalendar[Calendar.MINUTE] = 59
+        startCalendar[Calendar.SECOND] = 59
+        startCalendar[Calendar.MILLISECOND] = 999
+        val endTime = startCalendar.timeInMillis
+
+
+        startCalendar[Calendar.HOUR_OF_DAY] = 0
+        startCalendar[Calendar.MINUTE] = 0
+        startCalendar[Calendar.SECOND] = 0
+        startCalendar[Calendar.MILLISECOND] = 0
+        val startTime = startCalendar.timeInMillis
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
         val unit = getUnit(type)
@@ -201,7 +223,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                         .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
                         .bucketByActivitySegment(1, TimeUnit.MILLISECONDS)
-                        .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
+                        .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                         .build()
 
                 val datasource = DataSource.Builder()
