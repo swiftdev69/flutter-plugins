@@ -237,7 +237,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                 val dataSetx: List<DataSet> = it.dataSets
 
                                 dataSetx.forEach { dataSet ->
-                                    `if (dataSet.dataType.name == "com.google.step_count.delta") {
+                                    if (dataSet.dataType.name == "com.google.step_count.delta") {
 
                                         if (dataSet.dataPoints.size > 0) {
 
@@ -246,7 +246,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                                             Log.e("STEPS IS", "${dataSet.dataPoints[0].getStartTime(TimeUnit.MILLISECONDS)} And ${dataSet.dataPoints[0].getValue(Field.FIELD_STEPS)} AND ${dataSet.dataPoints[0].getStartTime(TimeUnit.MILLISECONDS)}")
                                         }
-                                    }`
+                                    }
                                 }
 
 
