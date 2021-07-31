@@ -286,9 +286,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                             }
 
-                            Log.e("GoogleFit", "Steps total is $total")
-                            Log.e("GoogleFit", "Total cal is $expendedCalories")
-                            Log.e("GoogleFit", "Total distance is $distance")
 
                             result.success(newDataList)
                         }
