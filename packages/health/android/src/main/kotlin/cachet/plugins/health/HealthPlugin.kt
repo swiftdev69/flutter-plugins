@@ -208,24 +208,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
                         .build()
 
-                /*val newRequest = DataReadRequest.Builder()
-                        .aggregate(ESTIMATED_STEP_DELTAS, DataType.TYPE_STEP_COUNT_DELTA)
-                        .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
-                        .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
-                        .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
-                        .bucketByTime(1, TimeUnit.DAYS)
-                        .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
-                        .build()
-*/
                 ///NEW CODE START
-
-                /* val request = DataReadRequest.Builder()
-                         .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                         .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
-                         .bucketByTime(1, TimeUnit.DAYS)
-                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
-                         .build()*/
-
                 Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
                         .readData(newRequest)
                         .addOnSuccessListener { response ->
@@ -240,6 +223,15 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     if (dataSet.dataType.name == "com.google.step_count.delta") {
 
                                         if (dataSet.dataPoints.size > 0) {
+
+                                            val data = hashMapOf(
+                                                    "value" to getHealthDataValue(dataSet.dataPoints[0], Field.FIELD_STEPS),
+                                                    "date_from" to dataSet.dataPoints[0].getStartTime(TimeUnit.MILLISECONDS),
+                                                    "date_to" to dataSet.dataPoints[0].getEndTime(TimeUnit.MILLISECONDS),
+                                                    "unit" to unit.toString()
+                                            )
+
+                                            newDataList.add(data)
 
                                             //total step
                                             total += dataSet.dataPoints[0].getValue(Field.FIELD_STEPS).asInt()
@@ -259,6 +251,16 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                                             if (dp.getEndTime(TimeUnit.MILLISECONDS) > dp.getStartTime(TimeUnit.MILLISECONDS)) {
                                                 for (field in dp.dataType.fields) {
+
+                                                    val data = hashMapOf(
+                                                            "value" to getHealthDataValue(dp, field),
+                                                            "date_from" to dataSet.dataPoints[0].getStartTime(TimeUnit.MILLISECONDS),
+                                                            "date_to" to dataSet.dataPoints[0].getEndTime(TimeUnit.MILLISECONDS),
+                                                            "unit" to unit.toString()
+                                                    )
+
+                                                    newDataList.add(data)
+
                                                     // total calories burned
                                                     expendedCalories += dp.getValue(field).asFloat()
                                                     Log.e("CALOURIE IS", "${dp.getStartTime(TimeUnit.MILLISECONDS)} And ${dp.getValue(field).asFloat()} AND ${dp.getEndTime(TimeUnit.MILLISECONDS)}")
@@ -269,7 +271,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     }
                                 }
 
-
                                 val dataSetsdistance: List<DataSet> = it.dataSets
 
                                 dataSetsdistance.forEach { dataSet ->
@@ -278,6 +279,17 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                         dataSet.dataPoints.forEach { dp ->
                                             if (dp.getEndTime(TimeUnit.MILLISECONDS) > dp.getStartTime(TimeUnit.MILLISECONDS)) {
                                                 for (field in dp.dataType.fields) {
+
+                                                    val data = hashMapOf(
+                                                            "value" to getHealthDataValue(dp, field),
+                                                            "date_from" to dataSet.dataPoints[0].getStartTime(TimeUnit.MILLISECONDS),
+                                                            "date_to" to dataSet.dataPoints[0].getEndTime(TimeUnit.MILLISECONDS),
+                                                            "unit" to unit.toString()
+                                                    )
+
+                                                    newDataList.add(data)
+
+                                                    distance = ((dp.getValue(field).asFloat() * 0.001).toFloat())
                                                     Log.e("DISTANCE ", "${dp.getValue(field)}")
 
                                                 }
@@ -318,23 +330,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                             Log.e("GoogleFit", "Steps total is $total")
                             Log.e("GoogleFit", "Total cal is $expendedCalories")
                             Log.e("GoogleFit", "Total distance is $distance")
-
-
-                            val data = hashMapOf(
-                                    "value" to total,
-                                    "date_from" to startTimeFromFlutter,
-                                    "date_to" to endTimeFromFlutter,
-                                    "unit" to Field.FIELD_STEPS.toString()
-                            )
-                            newDataList.add(data)
-                            val calouriData = hashMapOf(
-                                    "value" to expendedCalories,
-                                    "date_from" to startTimeFromFlutter,
-                                    "date_to" to endTimeFromFlutter,
-                                    "unit" to Field.FIELD_CALORIES.toString()
-
-                            )
-                            newDataList.add(calouriData)
 
                             result.success(newDataList)
                         }
