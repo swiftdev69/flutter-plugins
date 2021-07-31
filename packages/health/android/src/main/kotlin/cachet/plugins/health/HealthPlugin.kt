@@ -293,6 +293,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                             }
 
 
+                            /*
                             val dataList = mutableListOf<Map<String, Any>>()
                             response.buckets.forEach {
 
@@ -311,7 +312,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     }
 
                                 }
-                            }
+                            }*/
 
 
                             Log.e("GoogleFit", "Steps total is $total")
