@@ -162,20 +162,13 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
         }
     }
 
-    fun removeLastNDigits(x: Long, n: Long): Long {
-        return (x / Math.pow(10.0, n.toDouble())).toLong()
-    }
-
 
     /// Called when the "getHealthDataByType" is invoked from Flutter
     private fun getData(call: MethodCall, result: Result) {
         val type = call.argument<String>("dataTypeKey")!!
-        var startTimeFromFlutter = call.argument<Long>("startDate")!!
-        var endTimeFromFlutter = call.argument<Long>("endDate")!!
+        val startTimeFromFlutter = call.argument<Long>("startDate")!!
+        val endTimeFromFlutter = call.argument<Long>("endDate")!!
 
-        /*  startTimeFromFlutter = removeLastNDigits(startTimeFromFlutter, 3)
-          endTimeFromFlutter = removeLastNDigits(endTimeFromFlutter, 3)
-  */
 
         // Look up data type and unit for the type key
         val dataType = keyToHealthDataType(type)
@@ -291,89 +284,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                     }
                                 }
 
-
-                               /* val dataSets: List<DataSet> = it.dataSets
-
-                                dataSets.forEach { dataSet ->
-                                    if (dataSet.dataType.name == "com.google.calories.expended") {
-
-                                        dataSet.dataPoints.forEach { dp ->
-
-                                            if (dp.getEndTime(TimeUnit.MILLISECONDS) > dp.getStartTime(TimeUnit.MILLISECONDS)) {
-                                                for (field in dp.dataType.fields) {
-
-                                                    val data = hashMapOf(
-                                                            "value" to getHealthDataValue(dp, field),
-                                                            "date_from" to dataSet.dataPoints[0].getStartTime(TimeUnit.MILLISECONDS),
-                                                            "date_to" to dataSet.dataPoints[0].getEndTime(TimeUnit.MILLISECONDS),
-                                                            "unit" to unit.toString()
-                                                    )
-
-                                                    newDataList.add(data)
-
-                                                    // total calories burned
-                                                    expendedCalories += dp.getValue(field).asFloat()
-                                                    Log.e("CALOURIE IS", "${dp.getStartTime(TimeUnit.MILLISECONDS)} And ${dp.getValue(field).asFloat()} AND ${dp.getEndTime(TimeUnit.MILLISECONDS)}")
-                                                }
-                                            }
-
-                                        }
-                                    }
-                                }
-
-                                val dataSetsdistance: List<DataSet> = it.dataSets
-
-                                dataSetsdistance.forEach { dataSet ->
-                                    if (dataSet.dataType.name == "com.google.distance.delta") {
-
-                                        dataSet.dataPoints.forEach { dp ->
-                                            if (dp.getEndTime(TimeUnit.MILLISECONDS) > dp.getStartTime(TimeUnit.MILLISECONDS)) {
-                                                for (field in dp.dataType.fields) {
-
-                                                    val data = hashMapOf(
-                                                            "value" to getHealthDataValue(dp, field),
-                                                            "date_from" to dataSet.dataPoints[0].getStartTime(TimeUnit.MILLISECONDS),
-                                                            "date_to" to dataSet.dataPoints[0].getEndTime(TimeUnit.MILLISECONDS),
-                                                            "unit" to unit.toString()
-                                                    )
-
-                                                    newDataList.add(data)
-
-                                                    distance = ((dp.getValue(field).asFloat() * 0.001).toFloat())
-                                                    Log.e("DISTANCE ", "${dp.getValue(field)}")
-
-                                                }
-                                            }
-
-
-                                        }
-                                    }
-                                }*/
-
                             }
-
-
-                            /*
-                            val dataList = mutableListOf<Map<String, Any>>()
-                            response.buckets.forEach {
-
-                                it.dataSets.forEach {
-
-                                    it.dataPoints.forEach { dataPoint ->
-                                        val data = hashMapOf(
-                                                "value" to getHealthDataValue(dataPoint, unit),
-                                                "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
-                                                "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
-                                                "unit" to unit.toString()
-                                        )
-
-                                        Log.e("TEMP DATA ",data.toString())
-                                        dataList.add(data)
-                                    }
-
-                                }
-                            }*/
-
 
                             Log.e("GoogleFit", "Steps total is $total")
                             Log.e("GoogleFit", "Total cal is $expendedCalories")
@@ -462,31 +373,61 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
     }
 }
 
-/*
+//old for loop for all field
+/* val dataSets: List<DataSet> = it.dataSets
 
-///fetch only current date date
+                                dataSets.forEach { dataSet ->
+                                    if (dataSet.dataType.name == "com.google.calories.expended") {
 
-Fitness.getHistoryClient(activity.applicationContext,googleSignInAccount)
-                       .readDailyTotal(dataType)
-                       .addOnSuccessListener { dataSet ->
-                           val total = when {
-                               dataSet.isEmpty -> 0
-                               else -> {
-                                   val healthData = dataSet.dataPoints.mapIndexed { _, dataPoint ->
-                                       return@mapIndexed hashMapOf(
-                                               "value" to getHealthDataValue(dataPoint, unit),
-                                               "date_from" to dataPoint.getStartTime(TimeUnit.MILLISECONDS),
-                                               "date_to" to dataPoint.getEndTime(TimeUnit.MILLISECONDS),
-                                               "unit" to unit.toString()
-                                       )
-                                   }
-                                   activity.runOnUiThread { result.success(healthData) }
+                                        dataSet.dataPoints.forEach { dp ->
 
-                                   dataSet.dataPoints.first().getValue(Field.FIELD_STEPS).asInt()
-                               }
-                           }
-                          Log.i("LOG IS THIS+++++++>", "Total steps: $total")
-                       }
-                       .addOnFailureListener { e ->
-                           //Log.w(TAG, "There was a problem getting the step count.", e)
-                       }*/
+                                            if (dp.getEndTime(TimeUnit.MILLISECONDS) > dp.getStartTime(TimeUnit.MILLISECONDS)) {
+                                                for (field in dp.dataType.fields) {
+
+                                                    val data = hashMapOf(
+                                                            "value" to getHealthDataValue(dp, field),
+                                                            "date_from" to dataSet.dataPoints[0].getStartTime(TimeUnit.MILLISECONDS),
+                                                            "date_to" to dataSet.dataPoints[0].getEndTime(TimeUnit.MILLISECONDS),
+                                                            "unit" to unit.toString()
+                                                    )
+
+                                                    newDataList.add(data)
+
+                                                    // total calories burned
+                                                    expendedCalories += dp.getValue(field).asFloat()
+                                                    Log.e("CALOURIE IS", "${dp.getStartTime(TimeUnit.MILLISECONDS)} And ${dp.getValue(field).asFloat()} AND ${dp.getEndTime(TimeUnit.MILLISECONDS)}")
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                }
+
+                                val dataSetsdistance: List<DataSet> = it.dataSets
+
+                                dataSetsdistance.forEach { dataSet ->
+                                    if (dataSet.dataType.name == "com.google.distance.delta") {
+
+                                        dataSet.dataPoints.forEach { dp ->
+                                            if (dp.getEndTime(TimeUnit.MILLISECONDS) > dp.getStartTime(TimeUnit.MILLISECONDS)) {
+                                                for (field in dp.dataType.fields) {
+
+                                                    val data = hashMapOf(
+                                                            "value" to getHealthDataValue(dp, field),
+                                                            "date_from" to dataSet.dataPoints[0].getStartTime(TimeUnit.MILLISECONDS),
+                                                            "date_to" to dataSet.dataPoints[0].getEndTime(TimeUnit.MILLISECONDS),
+                                                            "unit" to unit.toString()
+                                                    )
+
+                                                    newDataList.add(data)
+
+                                                    distance = ((dp.getValue(field).asFloat() * 0.001).toFloat())
+                                                    Log.e("DISTANCE ", "${dp.getValue(field)}")
+
+                                                }
+                                            }
+
+
+                                        }
+                                    }
+                                }*/
