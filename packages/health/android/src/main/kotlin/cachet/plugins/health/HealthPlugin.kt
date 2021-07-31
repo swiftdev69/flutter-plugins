@@ -199,11 +199,21 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                         .setAppPackageName("com.google.android.gms")
                         .build()
 
-                val newRequest = DataReadRequest.Builder()
+                ///workinng steps and calouris
+                /*val newRequest = DataReadRequest.Builder()
                         .aggregate(ESTIMATED_STEP_DELTAS, DataType.AGGREGATE_STEP_COUNT_DELTA)
                         .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                         .aggregate(DataType.TYPE_DISTANCE_DELTA,DataType.AGGREGATE_DISTANCE_DELTA)
                         .bucketByActivitySegment(1, TimeUnit.MILLISECONDS)
+                        .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
+                        .build()*/
+
+                val newRequest = DataReadRequest.Builder()
+                        .aggregate(ESTIMATED_STEP_DELTAS, DataType.TYPE_STEP_COUNT_DELTA)
+                        .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
+                        .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
+                        .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
+                        .bucketByTime(1, TimeUnit.DAYS)
                         .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.MILLISECONDS)
                         .build()
 
@@ -215,8 +225,6 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                          .bucketByTime(1, TimeUnit.DAYS)
                          .setTimeRange(startTimeFromFlutter, endTimeFromFlutter, TimeUnit.SECONDS)
                          .build()*/
-
-
 
                 Fitness.getHistoryClient(activity.applicationContext, googleSignInAccount)
                         .readData(newRequest)
