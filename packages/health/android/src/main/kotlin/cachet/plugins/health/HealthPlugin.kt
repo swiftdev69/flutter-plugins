@@ -220,18 +220,18 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                 val dataSetx: List<DataSet> = it.dataSets
 
                                 dataSetx.forEach { dataSet ->
-                                    if (dataSet.dataType.name == "com.google.step_count.delta") {
+                                    if (type == "STEPS" && dataSet.dataType.name == "com.google.step_count.delta") {
 
                                         if (dataSet.dataPoints.size > 0) {
 
-                                            val data = hashMapOf(
-                                                    "value" to getHealthDataValue(dataSet.dataPoints[0], Field.FIELD_STEPS),
+                                            val stepsData = hashMapOf(
+                                                    "value" to getHealthDataValue(dataSet.dataPoints[0], unit),
                                                     "date_from" to dataSet.dataPoints[0].getStartTime(TimeUnit.MILLISECONDS),
                                                     "date_to" to dataSet.dataPoints[0].getEndTime(TimeUnit.MILLISECONDS),
                                                     "unit" to unit.toString()
                                             )
 
-                                            newDataList.add(data)
+                                            newDataList.add(stepsData)
 
                                             //total step
                                             total += dataSet.dataPoints[0].getValue(Field.FIELD_STEPS).asInt()
@@ -239,10 +239,60 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
                                             Log.e("STEPS IS", "${dataSet.dataPoints[0].getStartTime(TimeUnit.MILLISECONDS)} And ${dataSet.dataPoints[0].getValue(Field.FIELD_STEPS)} AND ${dataSet.dataPoints[0].getStartTime(TimeUnit.MILLISECONDS)}")
                                         }
                                     }
+
+                                    else if (type == "ACTIVE_ENERGY_BURNED" && dataSet.dataType.name == "com.google.calories.expended") {
+
+                                        dataSet.dataPoints.forEach { dp ->
+
+                                            if (dp.getEndTime(TimeUnit.MILLISECONDS) > dp.getStartTime(TimeUnit.MILLISECONDS)) {
+                                                for (field in dp.dataType.fields) {
+
+                                                    val caloriesData = hashMapOf(
+                                                            "value" to getHealthDataValue(dp, unit),
+                                                            "date_from" to dp.getStartTime(TimeUnit.MILLISECONDS),
+                                                            "date_to" to dp.getEndTime(TimeUnit.MILLISECONDS),
+                                                            "unit" to unit.toString()
+                                                    )
+
+                                                    newDataList.add(caloriesData)
+
+                                                    // total calories burned
+                                                    expendedCalories += dp.getValue(field).asFloat()
+                                                    Log.e("CALOURIE IS", "${dp.getStartTime(TimeUnit.MILLISECONDS)} And ${dp.getValue(field).asFloat()} AND ${dp.getEndTime(TimeUnit.MILLISECONDS)}")
+                                                }
+                                            }
+
+                                        }
+                                    }
+
+                                    else if (type == "DISTANCE_DELTA" && dataSet.dataType.name == "com.google.distance.delta") {
+
+                                        dataSet.dataPoints.forEach { dp ->
+                                            if (dp.getEndTime(TimeUnit.MILLISECONDS) > dp.getStartTime(TimeUnit.MILLISECONDS)) {
+                                                for (field in dp.dataType.fields) {
+
+                                                    val distanceData = hashMapOf(
+                                                            "value" to getHealthDataValue(dp, unit),
+                                                            "date_from" to dp.getStartTime(TimeUnit.MILLISECONDS),
+                                                            "date_to" to dp.getEndTime(TimeUnit.MILLISECONDS),
+                                                            "unit" to unit.toString()
+                                                    )
+
+                                                    newDataList.add(distanceData)
+
+                                                    distance = ((dp.getValue(field).asFloat() * 0.001).toFloat())
+                                                    Log.e("DISTANCE ", "${dp.getValue(field)}")
+
+                                                }
+                                            }
+
+
+                                        }
+                                    }
                                 }
 
 
-                                val dataSets: List<DataSet> = it.dataSets
+                               /* val dataSets: List<DataSet> = it.dataSets
 
                                 dataSets.forEach { dataSet ->
                                     if (dataSet.dataType.name == "com.google.calories.expended") {
@@ -298,9 +348,7 @@ class HealthPlugin(val activity: Activity, val channel: MethodChannel) : MethodC
 
                                         }
                                     }
-                                }
-
-
+                                }*/
 
                             }
 
